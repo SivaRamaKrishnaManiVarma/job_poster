@@ -2,8 +2,8 @@
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
 
-//if (!isAdmin()) redirect('login.php');
-$_SESSION['admin_username'] = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : 'Admin';
+if (!isAdmin()) redirect('login.php');
+// $_SESSION['admin_username'] = isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : 'Admin';
 $pageTitle = 'Admin Dashboard';
 $isAdmin = true;
 
@@ -11,7 +11,7 @@ $totalJobs = $pdo->query("SELECT COUNT(*) FROM jobs")->fetchColumn();
 $activeJobs = $pdo->query("SELECT COUNT(*) FROM jobs WHERE is_active = 1")->fetchColumn();
 $recentJobs = $pdo->query("SELECT * FROM jobs ORDER BY created_at DESC LIMIT 5")->fetchAll();
 
-include '../includes/header.php';
+include 'includes/header.php';
 ?>
 
 <h2>Welcome, <?php echo sanitize($_SESSION['admin_username']); ?>!</h2>
