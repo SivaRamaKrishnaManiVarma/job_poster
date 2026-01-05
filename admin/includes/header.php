@@ -1,10 +1,3 @@
-<?php
-// Session check
-// if (isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit;
-// }
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,6 +37,16 @@
                 <li class="nav-item">
                     <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'jobs.php' ? 'active' : ''; ?>" href="jobs.php">
                         💼 Manage Jobs
+                    </a>
+                </li>
+                  <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'help.php' ? 'active' : ''; ?>" href="help.php">
+                        📚 Help
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>" href="settings.php">
+                        ⚙️ Settings
                     </a>
                 </li>
                 <li class="nav-item">
