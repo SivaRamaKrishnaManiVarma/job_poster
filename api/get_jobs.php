@@ -17,6 +17,7 @@ try {
     // Base query with JOINs
     $sql = "SELECT 
         j.id,
+          j.slug,
         j.title,
         j.company,
         j.description,

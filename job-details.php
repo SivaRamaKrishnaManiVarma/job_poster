@@ -3,12 +3,24 @@ require_once 'includes/config.php';
 require_once 'includes/functions.php';
 require_once 'includes/master-data-functions.php';
 
-// Get job ID from URL
+// Get job by slug or ID (fallback for old links)
+$slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 $jobId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-if ($jobId === 0) {
+if (empty($slug) && $jobId === 0) {
     header('Location: index.php');
     exit;
+}
+
+// Prepare query based on what's available
+if (!empty($slug)) {
+    // Use slug (preferred)
+    $whereClause = "j.slug = ? AND j.is_active = 1";
+    $param = $slug;
+} else {
+    // Fallback to ID (for backward compatibility)
+    $whereClause = "j.id = ? AND j.is_active = 1";
+    $param = $jobId;
 }
 
 // Get job details with all master data
@@ -28,13 +40,19 @@ $stmt = $pdo->prepare("SELECT j.*,
     LEFT JOIN master_states s ON j.state_id = s.id
     LEFT JOIN master_departments d ON j.department_id = d.id
     LEFT JOIN master_qualifications q ON j.min_qualification_id = q.id
-    WHERE j.id = ? AND j.is_active = 1");
-$stmt->execute([$jobId]);
+    WHERE $whereClause");
+$stmt->execute([$param]);
 $job = $stmt->fetch();
 
 // If job not found or inactive, redirect
 if (!$job) {
     header('Location: index.php');
+    exit;
+}
+
+// If accessed by ID, redirect to slug URL (for SEO)
+if ($jobId > 0 && !empty($job['slug'])) {
+    header('Location: job-details.php?slug=' . urlencode($job['slug']), true, 301);
     exit;
 }
 
@@ -44,7 +62,7 @@ $isExpired = $job['application_deadline'] && strtotime($job['application_deadlin
 // Get related jobs (same category, excluding current job)
 $relatedJobs = [];
 if ($job['job_category_id']) {
-    $stmt = $pdo->prepare("SELECT j.*, 
+    $stmt = $pdo->prepare("SELECT j.slug, j.id, j.title, j.company,
         c.category_name, c.icon as category_icon,
         w.mode_name, w.icon as work_mode_icon,
         e.type_name, e.icon as employment_icon,
@@ -55,14 +73,16 @@ if ($job['job_category_id']) {
         LEFT JOIN master_employment_types e ON j.employment_type_id = e.id
         LEFT JOIN master_experience_levels ex ON j.experience_level_id = ex.id
         WHERE j.job_category_id = ? 
-        AND j.id != ? 
+        AND j.id != ?
         AND j.is_active = 1
         AND (j.application_deadline IS NULL OR j.application_deadline >= CURDATE())
         ORDER BY j.posted_date DESC
         LIMIT 3");
-    $stmt->execute([$job['job_category_id'], $jobId]);
+    $stmt->execute([$job['job_category_id'], $job['id']]);
     $relatedJobs = $stmt->fetchAll();
 }
+
+
 
 $pageTitle = $job['title'] . ' - ' . $job['company'];
 
@@ -672,7 +692,7 @@ include 'includes/header.php';
         <h2 class="related-title">Similar Jobs</h2>
         <div class="related-jobs-grid">
             <?php foreach ($relatedJobs as $relJob): ?>
-            <a href="job-details.php?id=<?php echo $relJob['id']; ?>" class="related-job-card">
+                <a href="job-details.php?slug=<?php echo urlencode($relJob['slug'] ?: 'job-' . $relJob['id']); ?>" class="related-job-card">
                 <h3 class="related-job-title"><?php echo htmlspecialchars($relJob['title']); ?></h3>
                 <p class="related-job-company"><?php echo htmlspecialchars($relJob['company']); ?></p>
                 <div class="related-job-meta">

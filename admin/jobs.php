@@ -77,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 title, company, description, job_link, official_website,
                 job_category_id, work_mode_id, employment_type_id, experience_level_id, 
                 state_id, department_id, min_qualification_id,
-                location, posted_date, application_deadline, is_active
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                location, posted_date, application_deadline, is_active, slug
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             $stmt->execute([
                 sanitize($_POST['title']),
@@ -96,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 sanitize($_POST['location']),
                 $posted_date,
                 $deadline ?: null,
-                isset($_POST['is_active']) ? 1 : 0
+                isset($_POST['is_active']) ? 1 : 0,
+                 $slug 
             ]);
             
             $message = '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -109,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 title=?, company=?, description=?, job_link=?, official_website=?,
                 job_category_id=?, work_mode_id=?, employment_type_id=?, experience_level_id=?,
                 state_id=?, department_id=?, min_qualification_id=?,
-                location=?, posted_date=?, application_deadline=?, is_active=?
+                location=?, posted_date=?, application_deadline=?, is_active=?,  slug=?
                 WHERE id=?");
             
             $stmt->execute([
@@ -129,6 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $posted_date,
                 $deadline ?: null,
                 isset($_POST['is_active']) ? 1 : 0,
+                 $slug, 
                 $_POST['job_id']
             ]);
             

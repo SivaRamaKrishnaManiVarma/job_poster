@@ -23,112 +23,223 @@ include 'includes/header.php';
 ?>
 
 <style>
-.archive-banner {
-    background: linear-gradient(135deg, #6c757d, #495057);
-    color: white;
-    padding: 3rem 0;
-    text-align: center;
-    margin-bottom: 2rem;
-    border-radius: 12px;
-}
-
-.archive-banner h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.archive-banner p {
-    font-size: 1.125rem;
-    opacity: 0.9;
-    margin-bottom: 1rem;
-}
-
-.archive-notice {
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.archive-notice-icon {
-    font-size: 2rem;
-}
-
-.archive-notice-text h5 {
-    margin: 0 0 0.25rem 0;
-    color: #856404;
-}
-
-.archive-notice-text p {
-    margin: 0;
-    color: #856404;
-    font-size: 0.9375rem;
-}
-
-.job-card.archived {
-    opacity: 0.85;
+/* Archive Page Specific Styles */
+.archive-hero {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    padding: 4rem 0;
+    margin-bottom: 3rem;
     position: relative;
+    overflow: hidden;
 }
 
-.job-card.archived::before {
-    content: "ARCHIVED";
+.archive-hero::before {
+    content: '';
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: #6c757d;
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.5;
 }
 
-.back-to-jobs {
+.archive-hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.archive-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.archive-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1.5rem;
+}
+
+.archive-badge {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: var(--radius-lg);
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.back-link {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     color: var(--primary);
     text-decoration: none;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     transition: gap 0.2s;
 }
 
-.back-to-jobs:hover {
+.back-link:hover {
     gap: 0.75rem;
     color: var(--primary-hover);
+}
+
+.archive-notice {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 2px solid #ffc107;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.archive-notice-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.archive-notice-content h5 {
+    margin: 0 0 0.5rem 0;
+    color: #856404;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.archive-notice-content p {
+    margin: 0;
+    color: #856404;
+    line-height: 1.6;
+}
+
+.archive-notice-content a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Archived Job Card Styling */
+.job-card.archived {
+    position: relative;
+    border: 2px solid var(--gray-300);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.job-card.archived::after {
+    content: "EXPIRED";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--gray-600);
+    color: white;
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 2;
+    box-shadow: var(--shadow);
+}
+
+.job-card.archived:hover {
+    border-color: var(--gray-400);
+}
+
+.job-card.archived .company-logo {
+    background: linear-gradient(135deg, var(--gray-500), var(--gray-600));
+    opacity: 0.8;
+}
+
+.job-card.archived .job-card-title {
+    color: var(--gray-700);
+}
+
+.expired-notice {
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #c33;
+}
+
+.expired-notice strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.btn-archived {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-archived:hover {
+    background: var(--gray-400);
+    transform: none;
+    box-shadow: none;
+}
+
+.deadline-expired {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .archive-title {
+        font-size: 2rem;
+    }
+    
+    .archive-subtitle {
+        font-size: 1rem;
+    }
+    
+    .archive-notice {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .archive-notice-icon {
+        font-size: 2.5rem;
+    }
 }
 </style>
 
 <div class="container">
-    <!-- Back to Active Jobs -->
-    <a href="index.php" class="back-to-jobs">
+    <!-- Back Button -->
+    <a href="index.php" class="back-link">
         ← Back to Active Jobs
     </a>
 
-    <!-- Archive Banner -->
-    <div class="archive-banner">
-        <h1>📚 Job Archive</h1>
-        <p>Browse past job opportunities for reference</p>
-        <div class="mt-3">
-            <span class="badge bg-light text-dark fs-5 px-4 py-2">
-                <?php echo $totalArchived; ?> Archived Jobs
-            </span>
+    <!-- Archive Hero -->
+    <div class="archive-hero">
+        <div class="container">
+            <div class="archive-hero-content">
+                <h1 class="archive-title">📚 Job Archive</h1>
+                <p class="archive-subtitle">Browse past job opportunities for reference</p>
+                <div class="archive-badge">
+                    <?php echo $totalArchived; ?> Archived Jobs
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Archive Notice -->
     <div class="archive-notice">
         <div class="archive-notice-icon">ℹ️</div>
-        <div class="archive-notice-text">
-            <h5>Reference Only</h5>
-            <p>These jobs have passed their application deadlines. They are displayed here for reference purposes only. Visit <a href="index.php">Active Jobs</a> for current opportunities.</p>
+        <div class="archive-notice-content">
+            <h5>📌 Reference Only - Applications Closed</h5>
+            <p>These jobs have passed their application deadlines and are displayed here for reference purposes only. Visit <a href="index.php">Active Jobs</a> to explore current opportunities and apply.</p>
         </div>
     </div>
 
@@ -140,12 +251,12 @@ include 'includes/header.php';
                     <input type="text" 
                            name="search" 
                            id="searchInput"
-                           class="form-control" 
+                           class="form-control form-control-lg" 
                            placeholder="🔍 Search archived jobs..." 
                            autocomplete="off">
                 </div>
                 <div class="col-md-4">
-                    <select name="category" id="categorySelect" class="form-select">
+                    <select name="category" id="categorySelect" class="form-select form-select-lg">
                         <option value="">📂 All Categories</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?php echo $cat['id']; ?>">
@@ -158,7 +269,7 @@ include 'includes/header.php';
                     <input type="text" 
                            name="location" 
                            id="locationInput"
-                           class="form-control" 
+                           class="form-control form-control-lg" 
                            placeholder="📍 Location" 
                            autocomplete="off">
                 </div>
@@ -218,17 +329,18 @@ include 'includes/header.php';
             <select id="sortBy" class="form-select">
                 <option value="date_desc">Newest First</option>
                 <option value="date_asc">Oldest First</option>
-                <option value="deadline_asc">Deadline (Recent)</option>
+                <option value="deadline_asc">Recent Deadline</option>
                 <option value="company_asc">Company (A-Z)</option>
             </select>
         </div>
     </div>
 
     <!-- Job Listings Container -->
-    <div id="jobListings" style="position: relative;">
+    <div id="jobListings" style="position: relative; min-height: 400px;">
         <!-- Loading Overlay -->
         <div class="loading-overlay">
             <div class="spinner"></div>
+            <p class="loading-text">Loading archived jobs...</p>
         </div>
         
         <!-- Jobs will be loaded here via AJAX -->
@@ -237,7 +349,7 @@ include 'includes/header.php';
 </div>
 
 <script>
-// Archive Page - AJAX Search & Filter (show_expired = true)
+// Archive Page - AJAX Search & Filter
 (function() {
     'use strict';
     
@@ -257,7 +369,7 @@ include 'includes/header.php';
     const activeFiltersDiv = document.getElementById('activeFilters');
     
     let searchTimeout;
-    let currentFilters = { show_expired: true }; // IMPORTANT: Always show expired jobs
+    let currentFilters = { show_expired: true };
     
     // Initialize
     init();
@@ -293,7 +405,7 @@ include 'includes/header.php';
             employment_type: employmentTypeSelect.value,
             experience_level: experienceSelect.value,
             sort: sortBy.value,
-            show_expired: true // Always true for archive page
+            show_expired: true
         };
         
         updateUrl();
@@ -322,7 +434,9 @@ include 'includes/header.php';
                 jobsContainer.innerHTML = `
                     <div class="col-12">
                         <div class="alert alert-danger">
-                            ⚠️ Failed to load archived jobs. Please try again.
+                            <h5 class="alert-heading">⚠️ Failed to Load</h5>
+                            <p>We're having trouble loading archived jobs right now.</p>
+                            <button class="btn btn-sm btn-primary" onclick="location.reload()">🔄 Retry</button>
                         </div>
                     </div>
                 `;
@@ -337,7 +451,7 @@ include 'includes/header.php';
                         <div class="empty-state-icon">📭</div>
                         <h3>No Archived Jobs Found</h3>
                         <p>No jobs match your search criteria in the archive.</p>
-                        <a href="index.php" class="btn btn-primary mt-3">View Active Jobs</a>
+                        <a href="index.php" class="btn btn-primary mt-3">← View Active Jobs</a>
                     </div>
                 </div>
             `;
@@ -349,14 +463,14 @@ include 'includes/header.php';
         jobs.forEach(job => {
             html += `
                 <div class="col-lg-6 col-xl-4">
-                    <div class="job-card card archived">
-                        <div class="card-body">
+                    <div class="job-card archived">
+                        <div class="job-card-body">
                             <div class="company-logo">
                                 ${job.company.substring(0, 2).toUpperCase()}
                             </div>
                             
-                            <h5 class="card-title">${escapeHtml(job.title)}</h5>
-                            <h6 class="card-subtitle">${escapeHtml(job.company)}</h6>
+                            <h5 class="job-card-title">${escapeHtml(job.title)}</h5>
+                            <h6 class="job-card-subtitle">${escapeHtml(job.company)}</h6>
                             
                             <div class="job-info">
                                 ${job.work_mode ? `<span class="job-badge job-badge-blue">${job.work_mode_icon || '🏠'} ${escapeHtml(job.work_mode)}</span>` : ''}
@@ -367,26 +481,24 @@ include 'includes/header.php';
                             </div>
                             
                             ${job.description ? `
-                                <p class="card-text">
-                                    ${escapeHtml(job.description.substring(0, 150))}${job.description.length > 150 ? '...' : ''}
+                                <p class="job-card-text">
+                                    ${escapeHtml(job.description.substring(0, 120))}${job.description.length > 120 ? '...' : ''}
                                 </p>
                             ` : ''}
                             
                             <p class="posted-date">
                                 🕒 Posted: ${formatDate(job.posted_date)}
-                                ${job.application_deadline ? `<br><span class="deadline-expired">⚠️ Deadline: ${formatDate(job.application_deadline)}</span>` : ''}
+                                ${job.application_deadline ? `<br><span class="deadline-expired">⚠️ Expired: ${formatDate(job.application_deadline)}</span>` : ''}
                             </p>
                             
-                            <div class="alert alert-warning py-2 px-3 mb-2" style="font-size: 0.875rem;">
-                                <strong>Archive Notice:</strong> This job has expired. Link kept for reference only.
+                            <div class="expired-notice">
+                                <strong>⏰ Application Closed</strong>
+                                This position is no longer accepting applications
                             </div>
                             
-                            <a href="${escapeHtml(job.job_link)}" 
-                               target="_blank" 
-                               rel="noopener noreferrer" 
-                               class="btn-apply"
-                               style="opacity: 0.7; pointer-events: none; cursor: not-allowed;">
-                                Deadline Passed
+                            <a href="job-details.php?slug=${encodeURIComponent(job.slug || 'job-' + job.id)}" 
+                               class="btn-apply btn-archived">
+                                View Details (Archived)
                             </a>
                         </div>
                     </div>
@@ -484,7 +596,7 @@ include 'includes/header.php';
             card.style.transform = 'translateY(20px)';
             setTimeout(() => {
                 card.style.transition = 'all 0.4s ease';
-                card.style.opacity = '0.85';
+                card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
             }, index * 50);
         });

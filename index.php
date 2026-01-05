@@ -345,9 +345,10 @@ include 'includes/header.php';
                                 ${job.application_deadline ? getDeadlineHtml(job.application_deadline) : ''}
                             </p>
                             
-                            <a href="job-details.php?id=${job.id}" class="btn-apply">
+                            <a href="job-details.php?slug=${encodeURIComponent(job.slug || 'job-' + job.id)}" class="btn-apply">
                                 View Details →
                             </a>
+
                         </div>
                     </div>
                 </div>
