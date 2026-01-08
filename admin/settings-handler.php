@@ -509,13 +509,7 @@ function handleGet($pdo, $type, $id) {
 
 // ==================== HELPER FUNCTIONS ====================
 
-function generateSlug($text) {
-    $text = strtolower($text);
-    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
-    $text = preg_replace('/[\s-]+/', '-', $text);
-    $text = trim($text, '-');
-    return $text;
-}
+
 
 function getTabName($type) {
     $tabs = [

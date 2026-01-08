@@ -300,11 +300,13 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($jobCategories as $cat): 
-                                $usageCount = getJobCategoryUsageCount($pdo, $cat['id']);
+                            <?php
+                            $i=1;
+                             foreach ($jobCategories as $cat): 
+                                $usageCount = getJobCategoryUsageCount($pdo, $cat['id']); 
                             ?>
                             <tr>
-                                <td><?php echo $cat['id']; ?></td>
+                                <td><?php echo $i;$i++; ?></td>
                                 <td><div class="icon-preview"><?php echo $cat['icon']; ?></div></td>
                                 <td><strong><?php echo htmlspecialchars($cat['category_name']); ?></strong></td>
                                 <td><code><?php echo $cat['category_slug']; ?></code></td>
@@ -373,11 +375,11 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($workModes as $mode): 
+                            <?php $i=1; foreach ($workModes as $mode): 
                                 $usageCount = getWorkModeUsageCount($pdo, $mode['id']);
                             ?>
                             <tr>
-                                <td><?php echo $mode['id']; ?></td>
+                                <td><?php echo $i; $i++; ?></td>
                                 <td><div class="icon-preview"><?php echo $mode['icon']; ?></div></td>
                                 <td><strong><?php echo htmlspecialchars($mode['mode_name']); ?></strong></td>
                                 <td><?php echo $mode['display_order']; ?></td>
@@ -442,11 +444,11 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($employmentTypes as $type): 
+                            <?php $i=1; foreach ($employmentTypes as $type): 
                                 $usageCount = getEmploymentTypeUsageCount($pdo, $type['id']);
                             ?>
                             <tr>
-                                <td><?php echo $type['id']; ?></td>
+                                <td><?php echo $i; $i++; ?></td>
                                 <td><div class="icon-preview"><?php echo $type['icon']; ?></div></td>
                                 <td><strong><?php echo htmlspecialchars($type['type_name']); ?></strong></td>
                                 <td><?php echo $type['display_order']; ?></td>
@@ -511,11 +513,11 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($experienceLevels as $level): 
+                            <?php $i=1; foreach ($experienceLevels as $level): 
                                 $usageCount = getExperienceLevelUsageCount($pdo, $level['id']);
                             ?>
                             <tr>
-                                <td><?php echo $level['id']; ?></td>
+                                <td><?php echo $i; $i++ ?></td>
                                 <td><div class="icon-preview"><?php echo $level['icon']; ?></div></td>
                                 <td><strong><?php echo htmlspecialchars($level['level_name']); ?></strong></td>
                                 <td><?php echo $level['display_order']; ?></td>
@@ -578,9 +580,9 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($states as $state): ?>
+                            <?php $i=1; foreach ($states as $state): ?>
                             <tr>
-                                <td><?php echo $state['id']; ?></td>
+                                <td><?php echo $i; $i++ ?></td>
                                 <td><strong><?php echo htmlspecialchars($state['state_name']); ?></strong></td>
                                 <td><code><?php echo $state['state_code']; ?></code></td>
                                 <td>
@@ -637,9 +639,9 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($qualifications as $qual): ?>
+                            <?php $i=1; foreach ($qualifications as $qual): ?>
                             <tr>
-                                <td><?php echo $qual['id']; ?></td>
+                                <td><?php echo $i; $i++; ?></td>
                                 <td><strong><?php echo htmlspecialchars($qual['qualification_name']); ?></strong></td>
                                 <td><span class="badge bg-info"><?php echo $qual['qualification_level']; ?></span></td>
                                 <td><?php echo $qual['display_order']; ?></td>
@@ -696,9 +698,9 @@ include 'includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($departments as $dept): ?>
+                            <?php $i=1; foreach ($departments as $dept): ?>
                             <tr>
-                                <td><?php echo $dept['id']; ?></td>
+                                <td><?php echo $i; $i++; ?></td>
                                 <td><strong><?php echo htmlspecialchars($dept['department_name']); ?></strong></td>
                                 <td><span class="badge bg-primary"><?php echo $dept['department_type']; ?></span></td>
                                 <td>
