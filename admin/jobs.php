@@ -72,73 +72,109 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     
     if (empty($errors)) {
-        if (isset($_POST['add_job'])) {
-            $stmt = $pdo->prepare("INSERT INTO jobs (
-                title, company, description, job_link, official_website,
-                job_category_id, work_mode_id, employment_type_id, experience_level_id, 
-                state_id, department_id, min_qualification_id,
-                location, posted_date, application_deadline, is_active, slug
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            $stmt->execute([
-                sanitize($_POST['title']),
-                sanitize($_POST['company']),
-                $_POST['description'],
-                sanitize($_POST['job_link']),
-                sanitize($_POST['official_website']) ?: null,
-                $_POST['job_category_id'],
-                $_POST['work_mode_id'],
-                $_POST['employment_type_id'],
-                $_POST['experience_level_id'],
-                $_POST['state_id'] ?: null,
-                $_POST['department_id'] ?: null,
-                $_POST['min_qualification_id'] ?: null,
-                sanitize($_POST['location']),
-                $posted_date,
-                $deadline ?: null,
-                isset($_POST['is_active']) ? 1 : 0,
-                 $slug 
-            ]);
-            
-            $message = '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>✅ Success!</strong> Job posted successfully!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>';
-        } 
-        elseif (isset($_POST['edit_job'])) {
-            $stmt = $pdo->prepare("UPDATE jobs SET 
-                title=?, company=?, description=?, job_link=?, official_website=?,
-                job_category_id=?, work_mode_id=?, employment_type_id=?, experience_level_id=?,
-                state_id=?, department_id=?, min_qualification_id=?,
-                location=?, posted_date=?, application_deadline=?, is_active=?,  slug=?
-                WHERE id=?");
-            
-            $stmt->execute([
-                sanitize($_POST['title']),
-                sanitize($_POST['company']),
-                $_POST['description'],
-                sanitize($_POST['job_link']),
-                sanitize($_POST['official_website']) ?: null,
-                $_POST['job_category_id'],
-                $_POST['work_mode_id'],
-                $_POST['employment_type_id'],
-                $_POST['experience_level_id'],
-                $_POST['state_id'] ?: null,
-                $_POST['department_id'] ?: null,
-                $_POST['min_qualification_id'] ?: null,
-                sanitize($_POST['location']),
-                $posted_date,
-                $deadline ?: null,
-                isset($_POST['is_active']) ? 1 : 0,
-                 $slug, 
-                $_POST['job_id']
-            ]);
-            
-            $message = '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong>✅ Success!</strong> Job updated successfully!
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>';
-        }
+       if (isset($_POST['add_job'])) {
+                // Generate slug from title
+                $slug = generateSlug($_POST['title']);
+                
+                // Store deadline value to auto-sync with last_date_to_apply
+                $application_deadline = $deadline ?: null;
+                
+                $stmt = $pdo->prepare("INSERT INTO jobs (
+                    title, company, description, job_link, official_website,
+                    job_category_id, work_mode_id, employment_type_id, experience_level_id, 
+                    state_id, department_id, min_qualification_id,
+                    location, posted_date, application_deadline, last_date_to_apply,
+                    total_vacancies, age_limit_min, age_limit_max,
+                    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+                    payment_mode, notification_date, exam_date, result_date,
+                    is_active, slug
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                $stmt->execute([
+                    sanitize($_POST['title']),
+                    sanitize($_POST['company']),
+                    $_POST['description'],
+                    sanitize($_POST['job_link']),
+                    sanitize($_POST['official_website']) ?: null,
+                    $_POST['job_category_id'],
+                    $_POST['work_mode_id'],
+                    $_POST['employment_type_id'],
+                    $_POST['experience_level_id'],
+                    $_POST['state_id'] ?: null,
+                    $_POST['department_id'] ?: null,
+                    $_POST['min_qualification_id'] ?: null,
+                    sanitize($_POST['location']),
+                    $posted_date,
+                    $application_deadline,
+                    $application_deadline,
+                    $_POST['total_vacancies'] ?: null,
+                    $_POST['age_limit_min'] ?: null,
+                    $_POST['age_limit_max'] ?: null,
+                    $_POST['salary_min'] ?: null,
+                    $_POST['application_fee_general'] ?: null,
+                    $_POST['application_fee_obc'] ?: null,
+                    $_POST['application_fee_sc_st'] ?: null,
+                    sanitize($_POST['payment_mode']) ?: null,
+                    $_POST['notification_date'] ?: null,
+                    $_POST['exam_date'] ?: null,
+                    $_POST['result_date'] ?: null,
+                    isset($_POST['is_active']) ? 1 : 0,
+                    $slug  // ← Generated slug
+                ]);
+            }
+
+       elseif (isset($_POST['edit_job'])) {
+                // Generate slug from title
+                $slug = generateSlug($_POST['title']);
+                
+                // Store deadline value to auto-sync with last_date_to_apply
+                $application_deadline = $deadline ?: null;
+                
+                $stmt = $pdo->prepare("UPDATE jobs SET 
+                    title=?, company=?, description=?, job_link=?, official_website=?,
+                    job_category_id=?, work_mode_id=?, employment_type_id=?, experience_level_id=?,
+                    state_id=?, department_id=?, min_qualification_id=?,
+                    location=?, posted_date=?, application_deadline=?, last_date_to_apply=?,
+                    total_vacancies=?, age_limit_min=?, age_limit_max=?,
+                    salary_min=?, application_fee_general=?, application_fee_obc=?, application_fee_sc_st=?,
+                    payment_mode=?, notification_date=?, exam_date=?, result_date=?,
+                    is_active=?, slug=?
+                    WHERE id=?");
+                
+                $stmt->execute([
+                    sanitize($_POST['title']),
+                    sanitize($_POST['company']),
+                    $_POST['description'],
+                    sanitize($_POST['job_link']),
+                    sanitize($_POST['official_website']) ?: null,
+                    $_POST['job_category_id'],
+                    $_POST['work_mode_id'],
+                    $_POST['employment_type_id'],
+                    $_POST['experience_level_id'],
+                    $_POST['state_id'] ?: null,
+                    $_POST['department_id'] ?: null,
+                    $_POST['min_qualification_id'] ?: null,
+                    sanitize($_POST['location']),
+                    $posted_date,
+                    $application_deadline,
+                    $application_deadline,
+                    $_POST['total_vacancies'] ?: null,
+                    $_POST['age_limit_min'] ?: null,
+                    $_POST['age_limit_max'] ?: null,
+                    $_POST['salary_min'] ?: null,
+                    $_POST['application_fee_general'] ?: null,
+                    $_POST['application_fee_obc'] ?: null,
+                    $_POST['application_fee_sc_st'] ?: null,
+                    sanitize($_POST['payment_mode']) ?: null,
+                    $_POST['notification_date'] ?: null,
+                    $_POST['exam_date'] ?: null,
+                    $_POST['result_date'] ?: null,
+                    isset($_POST['is_active']) ? 1 : 0,
+                    $slug,  // ← Generated slug
+                    $_POST['job_id']
+                ]);
+            }
+
         
         // Refresh counts after add/edit
         $totalJobsAll = $pdo->query("SELECT COUNT(*) FROM jobs WHERE is_active = 1")->fetchColumn();
@@ -537,6 +573,167 @@ include 'includes/header.php';
                                    min="<?php echo date('Y-m-d'); ?>"
                                    id="applicationDeadline">
                             <div class="form-text" id="deadlineHelp">Last date for students to apply</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Vacancy Information -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>👥</span> Vacancy Information
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Total Vacancies</label>
+                            <input type="number" 
+                                   name="total_vacancies" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['total_vacancies'] : ''; ?>" 
+                                   min="1"
+                                   placeholder="e.g., 500">
+                            <div class="form-text">Total number of positions available</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Age Limit -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>📅</span> Age Eligibility
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Minimum Age</label>
+                            <input type="number" 
+                                   name="age_limit_min" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['age_limit_min'] : ''; ?>" 
+                                   min="18"
+                                   max="100"
+                                   placeholder="e.g., 18">
+                            <div class="form-text">Minimum age required</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Maximum Age</label>
+                            <input type="number" 
+                                   name="age_limit_max" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['age_limit_max'] : ''; ?>" 
+                                   min="18"
+                                   max="100"
+                                   placeholder="e.g., 35">
+                            <div class="form-text">Maximum age limit</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Salary Information -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>💰</span> Salary & Compensation
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Minimum Salary (₹)</label>
+                            <input type="number" 
+                                   name="salary_min" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['salary_min'] : ''; ?>" 
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="e.g., 25000">
+                            <div class="form-text">Minimum salary per month/year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Fees -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>💳</span> Application Fee Details
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">General/OC (₹)</label>
+                            <input type="number" 
+                                   name="application_fee_general" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['application_fee_general'] : ''; ?>" 
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="e.g., 500">
+                            <div class="form-text">Fee for General category</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">OBC/EWS (₹)</label>
+                            <input type="number" 
+                                   name="application_fee_obc" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['application_fee_obc'] : ''; ?>" 
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="e.g., 300">
+                            <div class="form-text">Fee for OBC/EWS category</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">SC/ST (₹)</label>
+                            <input type="number" 
+                                   name="application_fee_sc_st" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['application_fee_sc_st'] : ''; ?>" 
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="e.g., 0">
+                            <div class="form-text">Fee for SC/ST category</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Payment Mode</label>
+                            <select name="payment_mode" class="form-select">
+                                <option value="">-- Select Payment Mode --</option>
+                                <option value="Online" <?php echo ($editJob && $editJob['payment_mode'] == 'Online') ? 'selected' : ''; ?>>💳 Online (Net Banking/Card/UPI)</option>
+                                <option value="Offline" <?php echo ($editJob && $editJob['payment_mode'] == 'Offline') ? 'selected' : ''; ?>>🏦 Offline (Challan/DD)</option>
+                                <option value="Both" <?php echo ($editJob && $editJob['payment_mode'] == 'Both') ? 'selected' : ''; ?>>🔄 Both Online & Offline</option>
+                                <option value="Free" <?php echo ($editJob && $editJob['payment_mode'] == 'Free') ? 'selected' : ''; ?>>✅ No Fee</option>
+                            </select>
+                            <div class="form-text">How candidates can pay the fee</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Important Dates -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span>📆</span> Additional Important Dates
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Notification Release Date</label>
+                            <input type="date" 
+                                   name="notification_date" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['notification_date'] : ''; ?>">
+                            <div class="form-text">When notification was officially released</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Exam Date</label>
+                            <input type="date" 
+                                   name="exam_date" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['exam_date'] : ''; ?>">
+                            <div class="form-text">Scheduled examination date (if applicable)</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expected Result Date</label>
+                            <input type="date" 
+                                   name="result_date" 
+                                   class="form-control" 
+                                   value="<?php echo $editJob ? $editJob['result_date'] : ''; ?>">
+                            <div class="form-text">When results are expected to be announced</div>
                         </div>
                     </div>
                 </div>

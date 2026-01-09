@@ -1,0 +1,287 @@
+
+-- JOB 2: Banking Sector Job (SBI Clerk)
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'SBI Junior Associate (Clerical Cadre) 2026',
+    'State Bank of India',
+    'State Bank of India invites online applications for the post of Junior Associate. This is an excellent opportunity for graduates to join India's largest bank.',
+    'https://sbi.co.in/careers/clerk-recruitment',
+    'https://www.sbi.co.in',
+    4,  -- Banking category
+    2,  -- On-site
+    6,  -- Permanent
+    1,  -- Freshers
+    37, -- All India
+    5,  -- SBI department
+    27, -- Any Graduate
+    'Pan India',
+    '2026-01-05',
+    '2026-02-28',
+    '2026-02-28',
+    8000,
+    20,
+    28,
+    25000.00,
+    750.00,
+    125.00,
+    0.00,
+    'Online',
+    '2026-01-05',
+    '2026-04-15',
+    '2026-05-20',
+    1
+);
+
+-- JOB 3: SSC Combined Graduate Level Exam
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'SSC CGL 2026 - Combined Graduate Level Examination',
+    'Staff Selection Commission',
+    'SSC invites applications for Combined Graduate Level Examination for recruitment to various Group B and Group C posts in Central Government Ministries/Departments.',
+    'https://ssc.nic.in/cgl2026',
+    'https://ssc.nic.in',
+    12, -- SSC category
+    2,  -- On-site
+    6,  -- Permanent
+    1,  -- Freshers
+    37, -- All India
+    1,  -- SSC department
+    27, -- Any Graduate
+    'All India',
+    '2026-01-10',
+    '2026-03-10',
+    '2026-03-10',
+    3500,
+    18,
+    32,
+    44900.00,
+    100.00,
+    100.00,
+    0.00,
+    'Online',
+    '2026-01-10',
+    '2026-05-15',
+    '2026-07-30',
+    1
+);
+
+-- JOB 4: Railway Recruitment (RRB NTPC)
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'RRB NTPC Graduate Posts 2026',
+    'Railway Recruitment Board',
+    'Railway Recruitment Board conducts exam for Non-Technical Popular Categories (NTPC) for graduate level posts across all railway zones.',
+    'https://rrbonlinereg.in/ntpc-graduate',
+    'https://rrbonlinereg.in',
+    6,  -- Railway category
+    2,  -- On-site
+    6,  -- Permanent
+    1,  -- Freshers
+    37, -- All India
+    3,  -- RRB department
+    27, -- Any Graduate
+    'All Indian Railways',
+    '2026-01-08',
+    '2026-02-20',
+    '2026-02-20',
+    12000,
+    18,
+    33,
+    35400.00,
+    500.00,
+    250.00,
+    0.00,
+    'Online',
+    '2026-01-08',
+    '2026-04-10',
+    '2026-06-15',
+    1
+);
+
+-- JOB 5: Private IT Company (TCS Digital Hiring)
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'TCS Digital - Software Engineer 2026',
+    'Tata Consultancy Services',
+    'TCS is hiring fresh engineering graduates for Software Engineer roles in Digital Technology. Join India's leading IT services company.',
+    'https://tcs.com/careers/tcs-digital-2026',
+    'https://www.tcs.com',
+    11, -- IT Software category
+    3,  -- Hybrid
+    1,  -- Full-time
+    1,  -- Freshers
+    NULL, -- Multiple states
+    NULL, -- Private company
+    5,  -- B.Tech/B.E.
+    'Bangalore, Hyderabad, Pune, Chennai',
+    '2026-01-12',
+    '2026-02-28',
+    '2026-02-28',
+    3600,
+    NULL,
+    NULL,
+    42000.00,
+    0.00,
+    0.00,
+    0.00,
+    'Free',
+    '2026-01-12',
+    '2026-03-25',
+    '2026-04-10',
+    1
+);
+
+-- JOB 6: UPSC Civil Services Examination
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'UPSC Civil Services Examination (IAS/IPS/IFS) 2026',
+    'Union Public Service Commission',
+    'UPSC conducts Civil Services Examination annually for recruitment to various Civil Services including IAS, IPS, IFS and other Group A services.',
+    'https://upsc.gov.in/civil-services-2026',
+    'https://upsc.gov.in',
+    13, -- UPSC category
+    2,  -- On-site
+    6,  -- Permanent
+    1,  -- Freshers
+    37, -- All India
+    2,  -- UPSC department
+    27, -- Any Graduate
+    'All India',
+    '2026-02-01',
+    '2026-03-15',
+    '2026-03-15',
+    1000,
+    21,
+    32,
+    56100.00,
+    100.00,
+    100.00,
+    0.00,
+    'Both',
+    '2026-02-01',
+    '2026-06-08',
+    '2026-12-15',
+    1
+);
+
+-- JOB 7: Teaching Position (DSSSB TGT)
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'DSSSB TGT (Trained Graduate Teacher) 2026',
+    'Delhi Subordinate Services Selection Board',
+    'DSSSB invites applications for Trained Graduate Teacher positions in various subjects for Delhi Government Schools.',
+    'https://dsssb.delhi.gov.in/tgt2026',
+    'https://dsssb.delhi.gov.in',
+    7,  -- Teaching category
+    2,  -- On-site
+    6,  -- Permanent
+    1,  -- Freshers
+    29, -- Delhi
+    NULL,
+    14, -- B.Ed
+    'Delhi NCR',
+    '2026-01-15',
+    '2026-02-25',
+    '2026-02-25',
+    2500,
+    21,
+    30,
+    44900.00,
+    100.00,
+    100.00,
+    0.00,
+    'Online',
+    '2026-01-15',
+    '2026-04-20',
+    '2026-06-10',
+    1
+);
+
+-- JOB 8: Defense Recruitment (Indian Army Agniveer)
+INSERT INTO jobs (
+    title, company, description, job_link, official_website,
+    job_category_id, work_mode_id, employment_type_id, experience_level_id,
+    state_id, department_id, min_qualification_id,
+    location, posted_date, application_deadline, last_date_to_apply,
+    total_vacancies, age_limit_min, age_limit_max,
+    salary_min, application_fee_general, application_fee_obc, application_fee_sc_st,
+    payment_mode, notification_date, exam_date, result_date,
+    is_active
+) VALUES (
+    'Indian Army Agniveer General Duty 2026',
+    'Indian Army Recruitment',
+    'Indian Army invites applications for Agniveer General Duty scheme. Candidates will serve for 4 years with option for permanent commission.',
+    'https://joinindianarmy.nic.in/agniveer',
+    'https://joinindianarmy.nic.in',
+    5,  -- Defense category
+    2,  -- On-site
+    4,  -- Contract
+    1,  -- Freshers
+    37, -- All India
+    8,  -- Indian Army department
+    2,  -- 12th Pass
+    'Various Army Recruitment Centers',
+    '2026-01-20',
+    '2026-03-05',
+    '2026-03-05',
+    25000,
+    17,
+    23,
+    30000.00,
+    0.00,
+    0.00,
+    0.00,
+    'Free',
+    '2026-01-20',
+    '2026-04-15',
+    '2026-05-30',
+    1
+);
