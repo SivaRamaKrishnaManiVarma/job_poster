@@ -224,42 +224,6 @@ body {
     .main-content { order: 1; }
 }
 
-/* =====================================================
-   3. BREADCRUMB & BACK BUTTON
-   ===================================================== */
-
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-    color: var(--gray-600);
-    flex-wrap: wrap;
-}
-
-.breadcrumb a {
-    color: var(--primary);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.breadcrumb a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--primary);
-    transition: width 0.3s ease;
-}
-
-.breadcrumb a:hover::after { width: 100%; }
-
-.breadcrumb-separator { color: var(--gray-400); }
-
 .back-link {
     display: inline-flex;
     align-items: center;
@@ -977,10 +941,20 @@ body {
 
 </style>
 <div class="job-details-container">
-    <!-- Back Button -->
-    <a href="/job_poster/" class="back-link">
+   <!-- Smart Back Button - Preserves Search/Filters -->
+    <?php
+    // Check if user came from index page with filters
+    $referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+    $sameHost = strpos($referrer, $_SERVER['HTTP_HOST']) !== false;
+    $fromIndex = strpos($referrer, BASE_PATH . '/') !== false && strpos($referrer, '/jobs/') === false;
+
+    // If came from same site index with filters, go back there
+    $backUrl = ($sameHost && $fromIndex) ? $referrer : BASE_URL;
+    ?>
+    <a href="<?php echo htmlspecialchars($backUrl); ?>" class="back-link">
         ← Back to All Jobs
     </a>
+
 
     <!-- Quick Stats -->
     <?php if ($job['total_vacancies'] || $job['salary_min'] || $job['application_deadline'] || $job['view_count']): ?>
@@ -1014,6 +988,7 @@ body {
         <?php endif; ?>
     </div>
     <?php endif; ?>
+
 
     <!-- Job Header -->
     <div class="job-header">
@@ -1049,6 +1024,7 @@ body {
         </div>
     </div>
 
+
     <!-- Content Wrapper -->
     <div class="content-wrapper">
         <!-- Main Content (Shows FIRST on mobile) -->
@@ -1062,6 +1038,7 @@ body {
                 </div>
             </div>
             <?php endif; ?>
+
 
             <!-- Important Dates -->
             <?php if (count($timelineDates) > 0): ?>
@@ -1091,6 +1068,7 @@ body {
                 </div>
             </div>
             <?php endif; ?>
+
 
             <!-- Application Fees -->
             <?php if ($job['application_fee_general'] !== null || $job['application_fee_obc'] !== null || $job['application_fee_sc_st'] !== null): ?>
@@ -1140,6 +1118,7 @@ body {
             </div>
             <?php endif; ?>
 
+
             <!-- Age Eligibility -->
             <?php if ($job['age_limit_min'] || $job['age_limit_max']): ?>
             <div class="content-section">
@@ -1167,6 +1146,7 @@ body {
                 </div>
             </div>
             <?php endif; ?>
+
 
             <!-- Job Details -->
             <div class="content-section">
@@ -1212,6 +1192,7 @@ body {
             </div>
         </div>
 
+
         <!-- Sidebar (Shows AFTER main content on mobile) -->
         <div class="sidebar">
             <!-- Apply Card -->
@@ -1249,22 +1230,22 @@ body {
                 <div class="share-section">
                     <p class="share-title">📤 Share This Job</p>
                     <div class="share-buttons">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" 
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(fullUrl($_SERVER['REQUEST_URI'])); ?>" 
                         target="_blank" 
                         class="share-btn facebook">
                             Facebook
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>&text=<?php echo urlencode($job['title'] . ' at ' . $job['company']); ?>" 
+                        <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode(fullUrl($_SERVER['REQUEST_URI'])); ?>&text=<?php echo urlencode($job['title'] . ' at ' . $job['company']); ?>" 
                         target="_blank" 
                         class="share-btn twitter">
                             Twitter
                         </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" 
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo urlencode(fullUrl($_SERVER['REQUEST_URI'])); ?>" 
                         target="_blank" 
                         class="share-btn linkedin">
                             LinkedIn
                         </a>
-                        <a href="https://wa.me/?text=<?php echo urlencode($job['title'] . ' at ' . $job['company'] . ' - ' . 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" 
+                        <a href="https://wa.me/?text=<?php echo urlencode($job['title'] . ' at ' . $job['company'] . ' - ' . fullUrl($_SERVER['REQUEST_URI'])); ?>" 
                         target="_blank" 
                         class="share-btn whatsapp">
                             WhatsApp
@@ -1289,19 +1270,20 @@ body {
     </div>
 
 
+
     <!-- Related Jobs -->
     <?php if (count($relatedJobs) > 0): ?>
     <div class="related-section">
         <div class="related-header">
             <h2 class="related-title">🔗 Similar Jobs You Might Like</h2>
-            <a href="/job_poster/?category=<?php echo $job['job_category_id']; ?>" class="view-all-link">
+            <a href="<?php echo url('?category=' . $job['job_category_id']); ?>" class="view-all-link">
                 View All <?php echo htmlspecialchars($job['category_name']); ?> Jobs →
             </a>
         </div>
         
         <div class="related-jobs-grid">
             <?php foreach ($relatedJobs as $relJob): ?>
-                <a href="/job_poster/jobs/<?php echo urlencode($relJob['slug'] ?: 'job-' . $relJob['id']); ?>" class="related-job-card">
+                <a href="<?php echo url('jobs/' . urlencode($relJob['slug'] ?: 'job-' . $relJob['id'])); ?>" class="related-job-card">
                     <!-- Company Logo Badge -->
                     <div class="related-job-logo">
                         <?php echo strtoupper(substr($relJob['company'], 0, 2)); ?>
@@ -1375,9 +1357,11 @@ body {
                                     $relToday = strtotime(date('Y-m-d'));
                                     $relDaysLeft = floor(($relDeadline - $relToday) / (60 * 60 * 24));
                                 ?>
+                                <?php if ($relDaysLeft >= 0): ?>
                                 <span class="deadline-badge <?php echo $relDaysLeft <= 3 ? 'urgent' : 'warning'; ?>">
                                     <?php echo $relDaysLeft; ?> days left
                                 </span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -1388,5 +1372,6 @@ body {
     <?php endif; ?>
 
 </div>
+
 
 <?php include 'includes/footer.php'; ?>

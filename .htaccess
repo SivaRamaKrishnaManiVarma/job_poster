@@ -1,23 +1,33 @@
 # ============================================
-# Job Portal - Professional .htaccess
+# Job Portal - Universal .htaccess
+# Auto-detects localhost vs production
 # ============================================
 
 # Enable Rewrite Engine
 RewriteEngine On
-RewriteBase /job_poster/
+
+# ============================================
+# AUTO-DETECT ENVIRONMENT & SET BASE
+# ============================================
+# For localhost/job_poster/ - set base to /job_poster/
+RewriteCond %{HTTP_HOST} ^localhost$ [OR]
+RewriteCond %{HTTP_HOST} ^127\.0\.0\.1$
+RewriteRule .* - [E=BASE:/job_poster]
+
+# For production domain - set base to /
+RewriteCond %{HTTP_HOST} !^localhost$ [NC]
+RewriteCond %{HTTP_HOST} !^127\.0\.0\.1$
+RewriteRule .* - [E=BASE:]
 
 # ============================================
 # CLEAN URLs - Job Details
 # ============================================
-# Before: /job-details.php?slug=ssc-grade-c-stenographer-2026
-# After:  /jobs/ssc-grade-c-stenographer-2026
 
 # Rule 1: Redirect old URLs to new clean URLs (301 permanent)
 RewriteCond %{THE_REQUEST} /job-details\.php\?slug=([^&\s]+) [NC]
-RewriteRule ^ jobs/%1? [R=301,L]
+RewriteRule ^ %{ENV:BASE}/jobs/%1? [R=301,L]
 
 # Rule 2: Handle clean URLs internally
-# IMPORTANT: Only match slug patterns, not actual files/folders
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^jobs/([a-z0-9-]+)/?$ job-details.php?slug=$1 [L,QSA]
@@ -49,8 +59,11 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Protect includes folder
-RedirectMatch 403 ^/job_poster/includes/.*$
+# Protect includes folder (works for both localhost and production)
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_URI} ^.*/includes/.*$
+    RewriteRule ^(.*)$ - [F,L]
+</IfModule>
 
 # Block access to hidden files (like .git, .htaccess)
 <FilesMatch "^\.">
@@ -82,14 +95,16 @@ RedirectMatch 403 ^/job_poster/includes/.*$
 </IfModule>
 
 # ============================================
-# Error Pages (Optional)
+# Error Pages (Optional - Dynamic paths)
 # ============================================
-# ErrorDocument 404 /job_poster/404.php
-# ErrorDocument 403 /job_poster/403.php
-# ErrorDocument 500 /job_poster/500.php
+# ErrorDocument 404 /404.php
+# ErrorDocument 403 /403.php
+# ErrorDocument 500 /500.php
 
 # ============================================
 # Force HTTPS (Uncomment when going live)
 # ============================================
 # RewriteCond %{HTTPS} off
+# RewriteCond %{HTTP_HOST} !^localhost$ [NC]
+# RewriteCond %{HTTP_HOST} !^127\.0\.0\.1$ [NC]
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

@@ -295,71 +295,80 @@ include 'includes/header.php';
             });
     }
     
-    function displayJobs(jobs) {
-        if (jobs.length === 0) {
-            jobsContainer.innerHTML = `
-                <div class="col-12">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🔍</div>
-                        <h3>No Jobs Found</h3>
-                        <p>We couldn't find any jobs matching your search criteria. Try adjusting your filters.</p>
-                        <button class="btn btn-primary mt-3" onclick="location.reload()">View All Jobs</button>
-                    </div>
+function displayJobs(jobs) {
+    if (jobs.length === 0) {
+        jobsContainer.innerHTML = `
+            <div class="col-12">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <h3>No Jobs Found</h3>
+                    <p>We couldn't find any jobs matching your search criteria.</p>
+                    <button class="btn btn-primary mt-3" onclick="location.reload()">View All Jobs</button>
                 </div>
-            `;
-            return;
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    const basePath = '<?php echo BASE_PATH; ?>'; // Dynamic base path
+    
+    jobs.forEach(job => {
+        // Calculate deadline info
+        let deadlineHtml = '';
+        if (job.application_deadline) {
+            deadlineHtml = getDeadlineHtml(job.application_deadline);
         }
         
-        let html = '';
-        
-        jobs.forEach(job => {
-            html += `
-                <div class="col-lg-6 col-xl-4">
-                    <div class="job-card">
-                        <div class="job-card-body">
-                            <!-- Company Logo -->
-                            <div class="company-logo">
-                                ${job.company.substring(0, 2).toUpperCase()}
-                            </div>
-                            
-                            <h5 class="job-card-title">${escapeHtml(job.title)}</h5>
-                            <h6 class="job-card-subtitle">${escapeHtml(job.company)}</h6>
-                            
-                            <!-- Job Info Badges -->
-                            <div class="job-info">
-                                ${job.work_mode ? `<span class="job-badge job-badge-blue">${job.work_mode_icon || '🏠'} ${escapeHtml(job.work_mode)}</span>` : ''}
-                                ${job.employment_type ? `<span class="job-badge job-badge-teal">${job.employment_type_icon || '💼'} ${escapeHtml(job.employment_type)}</span>` : ''}
-                                ${job.experience_level ? `<span class="job-badge job-badge-green">${job.experience_level_icon || '🎓'} ${escapeHtml(job.experience_level)}</span>` : ''}
-                                ${job.location ? `<span class="job-badge job-badge-purple">📍 ${escapeHtml(job.location)}</span>` : ''}
-                                ${job.category ? `<span class="job-badge job-badge-orange">${job.category_icon || '🏷️'} ${escapeHtml(job.category)}</span>` : ''}
-                            </div>
-                            
-                            ${job.description ? `
-                                <p class="job-card-text">
-                                    ${escapeHtml(job.description.substring(0, 120))}${job.description.length > 120 ? '...' : ''}
-                                </p>
-                            ` : ''}
-                            
-                            <p class="posted-date">
-                                🕒 Posted on ${formatDate(job.posted_date)}
-                                ${job.application_deadline ? getDeadlineHtml(job.application_deadline) : ''}
-                            </p>
-                            
-                            <a href="jobs/${encodeURIComponent(job.slug)}" class="btn-apply">
-                                View Details →
-                            </a>
-
+        html += `
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <div class="job-card-body">
+                        <!-- Company Logo -->
+                        <div class="company-logo">
+                            ${job.company.substring(0, 2).toUpperCase()}
                         </div>
+                        
+                        <!-- Job Title & Company -->
+                        <h5 class="job-card-title">${escapeHtml(job.title)}</h5>
+                        <h6 class="job-card-subtitle">🏢 ${escapeHtml(job.company)}</h6>
+                        
+                        <!-- Job Meta Info -->
+                        <div class="job-card-info">
+                            ${job.location ? `📍 ${escapeHtml(job.location)}` : ''}
+                            ${job.total_vacancies ? `<br>👥 ${job.total_vacancies} Vacancies` : ''}
+                            ${job.salary_min ? `<br>💰 ₹${Number(job.salary_min).toLocaleString('en-IN')}/month` : ''}
+                            ${deadlineHtml}
+                        </div>
+                        
+                        <!-- Badges -->
+                        <div class="job-badges">
+                            ${job.category_name ? `<span class="job-badge job-badge-primary">${job.category_icon || '📂'} ${escapeHtml(job.category_name)}</span>` : ''}
+                            ${job.mode_name ? `<span class="job-badge job-badge-blue">${job.work_mode_icon || '🏠'} ${escapeHtml(job.mode_name)}</span>` : ''}
+                            ${job.type_name ? `<span class="job-badge job-badge-teal">${job.employment_icon || '💼'} ${escapeHtml(job.type_name)}</span>` : ''}
+                            ${job.level_name ? `<span class="job-badge job-badge-green">${job.experience_icon || '🎓'} ${escapeHtml(job.level_name)}</span>` : ''}
+                        </div>
+                        
+                        <!-- Posted Date -->
+                        <div class="job-posted-date">
+                            📅 Posted ${formatDate(job.posted_date)}
+                        </div>
+                        
+                        <!-- View Details Button -->
+                        <a href="${basePath}/jobs/${encodeURIComponent(job.slug || 'job-' + job.id)}" class="btn-apply">
+                            View Details →
+                        </a>
                     </div>
                 </div>
-            `;
-        });
-        
-        jobsContainer.innerHTML = html;
-        
-        // Animate cards
-        animateCards();
-    }
+            </div>
+        `;
+    });
+    
+    jobsContainer.innerHTML = html;
+    animateCards();
+}
+
+
     
     function getDeadlineHtml(deadline) {
         const deadlineDate = new Date(deadline);
