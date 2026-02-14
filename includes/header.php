@@ -4,6 +4,11 @@ if (!defined('BASE_PATH')) {
     require_once __DIR__ . '/config.php';
 }
 
+// Include auth functions only for non-admin pages
+if (!defined('ADMIN_AREA') && file_exists(__DIR__ . '/auth-functions.php')) {
+    require_once __DIR__ . '/auth-functions.php';
+}
+
 // Get counts for navigation badges
 $activeJobsCount = $pdo->query("
     SELECT COUNT(*) FROM jobs 
@@ -92,6 +97,8 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
     
     <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo BASE_PATH; ?>/assets/css/styles.css">
     
     <!-- Structured Data - WebSite Schema -->
@@ -202,7 +209,8 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
             
             <!-- Navigation Menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <!-- Active Jobs -->
                     <li class="nav-item">
                         <a class="nav-link <?php echo $currentPage == 'index.php' ? 'active fw-bold' : ''; ?>" 
                            href="<?php echo BASE_PATH; ?>/"
@@ -215,6 +223,8 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                             <?php endif; ?>
                         </a>
                     </li>
+                    
+                    <!-- Archive -->
                     <li class="nav-item">
                         <a class="nav-link <?php echo $currentPage == 'archive.php' ? 'active fw-bold' : ''; ?>" 
                            href="<?php echo BASE_PATH; ?>/archive.php"
@@ -227,20 +237,71 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    
+                    <!-- About -->
+                    <!-- <li class="nav-item">
                         <a class="nav-link <?php echo $currentPage == 'about.php' ? 'active fw-bold' : ''; ?>" 
                            href="<?php echo BASE_PATH; ?>/about.php"
                            aria-label="About Us">
                             ℹ️ About
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </li> -->
+                    
+                    <!-- Contact -->
+                    <!-- <li class="nav-item">
                         <a class="nav-link <?php echo $currentPage == 'contact.php' ? 'active fw-bold' : ''; ?>" 
                            href="<?php echo BASE_PATH; ?>/contact.php"
                            aria-label="Contact Us">
                             📧 Contact
                         </a>
-                    </li>
+                    </li> -->
+                    
+                    <!-- Candidate Authentication Menu -->
+                    <?php if (function_exists('isCandidateLoggedIn') && isCandidateLoggedIn()): ?>
+                        <!-- Logged In Candidate -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" 
+                               data-bs-toggle="dropdown" aria-expanded="false" aria-label="User Menu">
+                                <i class="fas fa-user-circle me-1"></i>
+                                <span class="d-none d-lg-inline"><?php echo htmlspecialchars($_SESSION['candidate_name'] ?? 'User'); ?></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo url('profile/dashboard.php'); ?>">
+                                        <i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo url('profile/edit-profile.php'); ?>">
+                                        <i class="fas fa-user-edit me-2 text-info"></i>Edit Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo url('profile/saved-jobs.php'); ?>">
+                                        <i class="fas fa-bookmark me-2 text-warning"></i>Saved Jobs
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="<?php echo url('auth/logout.php'); ?>">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    <?php else: ?>
+                        <!-- Not Logged In -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo url('auth/login.php'); ?>" aria-label="Login">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm ms-lg-2" href="<?php echo url('auth/register.php'); ?>" aria-label="Register">
+                                <i class="fas fa-user-plus me-1"></i>Register
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

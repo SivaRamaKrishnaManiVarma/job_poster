@@ -1,0 +1,11 @@
+# Allow only PDF downloads, prevent execution
+<FilesMatch "\.pdf$">
+    Header set Content-Type "application/pdf"
+    Header set Content-Disposition "inline"
+</FilesMatch>
+
+# Block all other file types
+<FilesMatch "\.(?!pdf$)[^.]+$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

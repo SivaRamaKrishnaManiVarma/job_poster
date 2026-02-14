@@ -1,0 +1,10 @@
+# Allow only image viewing
+<FilesMatch "\.(jpg|jpeg|png|gif)$">
+    Header set Content-Type "image/jpeg"
+</FilesMatch>
+
+# Block all other file types
+<FilesMatch "\.(?!(jpg|jpeg|png|gif)$)[^.]+$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

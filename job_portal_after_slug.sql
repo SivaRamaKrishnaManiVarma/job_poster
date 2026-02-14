@@ -865,6 +865,143 @@ ALTER TABLE `job_vacancies_breakdown`
   ADD CONSTRAINT `job_vacancies_breakdown_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE;
 COMMIT;
 
+
+
+-- ============================================
+-- CANDIDATE MANAGEMENT SYSTEM
+-- Database Tables for Job Portal
+-- Run this in phpMyAdmin
+-- ============================================
+
+-- 1. Users/Candidates Table
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `full_name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `phone` VARCHAR(15) DEFAULT NULL,
+  `location` VARCHAR(100) DEFAULT NULL,
+  `profile_photo` VARCHAR(255) DEFAULT NULL,
+  `resume_path` VARCHAR(255) DEFAULT NULL,
+  `bio` TEXT DEFAULT NULL,
+  `linkedin_url` VARCHAR(255) DEFAULT NULL,
+  `github_url` VARCHAR(255) DEFAULT NULL,
+  `portfolio_url` VARCHAR(255) DEFAULT NULL,
+  `total_experience_years` INT DEFAULT 0,
+  `current_company` VARCHAR(100) DEFAULT NULL,
+  `current_designation` VARCHAR(100) DEFAULT NULL,
+  `preferred_job_type_id` INT DEFAULT NULL COMMENT 'FK to master_employment_types',
+  `preferred_work_mode_id` INT DEFAULT NULL COMMENT 'FK to master_work_modes',
+  `expected_salary_min` DECIMAL(10,2) DEFAULT NULL,
+  `expected_salary_max` DECIMAL(10,2) DEFAULT NULL,
+  `is_active` TINYINT(1) DEFAULT 1,
+  `email_verified` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_login` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `idx_active` (`is_active`),
+  KEY `idx_email` (`email`),
+  KEY `idx_location` (`location`),
+  CONSTRAINT `fk_user_job_type` FOREIGN KEY (`preferred_job_type_id`) 
+    REFERENCES `master_employment_types` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_user_work_mode` FOREIGN KEY (`preferred_work_mode_id`) 
+    REFERENCES `master_work_modes` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 2. User Skills Table
+CREATE TABLE IF NOT EXISTS `user_skills` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `skill_name` VARCHAR(100) NOT NULL,
+  `proficiency_level` ENUM('Beginner', 'Intermediate', 'Advanced', 'Expert') DEFAULT 'Intermediate',
+  `years_of_experience` INT DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_skill_name` (`skill_name`),
+  CONSTRAINT `fk_skill_user` FOREIGN KEY (`user_id`) 
+    REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 3. User Education Table
+CREATE TABLE IF NOT EXISTS `user_education` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `degree` VARCHAR(100) NOT NULL,
+  `institution` VARCHAR(200) NOT NULL,
+  `field_of_study` VARCHAR(100) DEFAULT NULL,
+  `start_year` YEAR DEFAULT NULL,
+  `end_year` YEAR DEFAULT NULL,
+  `percentage_cgpa` VARCHAR(10) DEFAULT NULL,
+  `is_current` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_end_year` (`end_year`),
+  CONSTRAINT `fk_education_user` FOREIGN KEY (`user_id`) 
+    REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 4. User Experience Table
+CREATE TABLE IF NOT EXISTS `user_experience` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `company_name` VARCHAR(100) NOT NULL,
+  `designation` VARCHAR(100) NOT NULL,
+  `employment_type` ENUM('Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance') DEFAULT 'Full-time',
+  `location` VARCHAR(100) DEFAULT NULL,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE DEFAULT NULL,
+  `is_current` TINYINT(1) DEFAULT 0,
+  `description` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_is_current` (`is_current`),
+  KEY `idx_end_date` (`end_date`),
+  CONSTRAINT `fk_experience_user` FOREIGN KEY (`user_id`) 
+    REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 5. Saved Jobs (Bookmark Feature)
+CREATE TABLE IF NOT EXISTS `saved_jobs` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `job_id` INT(11) NOT NULL,
+  `saved_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_save` (`user_id`, `job_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_job_id` (`job_id`),
+  KEY `idx_saved_at` (`saved_at`),
+  CONSTRAINT `fk_saved_user` FOREIGN KEY (`user_id`) 
+    REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_saved_job` FOREIGN KEY (`job_id`) 
+    REFERENCES `jobs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 6. User Sessions (Optional but recommended for security)
+CREATE TABLE IF NOT EXISTS `user_sessions` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `session_token` VARCHAR(255) NOT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `user_agent` TEXT DEFAULT NULL,
+  `expires_at` TIMESTAMP NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `session_token` (`session_token`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_token` (`session_token`),
+  KEY `idx_expires` (`expires_at`),
+  CONSTRAINT `fk_session_user` FOREIGN KEY (`user_id`) 
+    REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+

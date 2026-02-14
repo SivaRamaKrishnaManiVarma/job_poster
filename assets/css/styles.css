@@ -632,3 +632,51 @@ body {
         page-break-inside: avoid;
     }
 }
+
+
+
+/* Candidate Dropdown Menu Styling */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    min-width: 200px;
+}
+
+.dropdown-item {
+    padding: 0.6rem 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    padding-left: 1.4rem;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+/* User icon in navbar */
+.nav-link .fa-user-circle {
+    font-size: 1.2rem;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 991px) {
+    .dropdown-menu {
+        border: 1px solid #dee2e6;
+        margin-top: 0.25rem;
+    }
+    
+    .btn-primary.btn-sm {
+        margin-top: 0.5rem;
+        width: 100%;
+    }
+}

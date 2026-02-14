@@ -1,12 +1,22 @@
 <?php
-session_start();
+// Start session only if not in CLI mode
+if (php_sapi_name() !== 'cli') {
+    session_start();
+}
 
 // ============================================
 // ENVIRONMENT DETECTION
 // ============================================
-$isLocalhost = (isset($_SERVER['HTTP_HOST']) && 
-                ($_SERVER['HTTP_HOST'] == "localhost" || 
-                 $_SERVER['HTTP_HOST'] == "127.0.0.1"));
+// Check if running from command line (cron) or web
+if (php_sapi_name() === 'cli') {
+    // Running from command line - assume localhost for development
+    $isLocalhost = true;
+} else {
+    // Running from web - check HTTP_HOST
+    $isLocalhost = (isset($_SERVER['HTTP_HOST']) && 
+                    ($_SERVER['HTTP_HOST'] == "localhost" || 
+                     $_SERVER['HTTP_HOST'] == "127.0.0.1"));
+}
 
 // ============================================
 // DATABASE CONFIGURATION
@@ -38,9 +48,22 @@ if ($isLocalhost) {
     define('BASE_PATH', '');
 }
 
+// ============================================
+// BASE URL CONFIGURATION
+// ============================================
 // Generate full base URL
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-define('BASE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . BASE_PATH);
+if (php_sapi_name() === 'cli') {
+    // Command line - use hardcoded URL
+    if ($isLocalhost) {
+        define('BASE_URL', 'http://localhost' . BASE_PATH);
+    } else {
+        define('BASE_URL', 'https://findwork.mindrevel.in/' . BASE_PATH); // Update for production
+    }
+} else {
+    // Web request - detect from HTTP_HOST
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    define('BASE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . BASE_PATH);
+}
 
 // ============================================
 // URL HELPER FUNCTION
@@ -80,16 +103,31 @@ try {
         ]
     );
 } catch(PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    // Log error
+    error_log("Database connection failed: " . $e->getMessage());
+    
+    // Show appropriate message based on context
+    if (php_sapi_name() === 'cli') {
+        die("Database connection failed. Check error logs.\n");
+    } else {
+        die("Database connection error. Please contact administrator.");
+    }
 }
+
+// ============================================
+// TIMEZONE
+// ============================================
+date_default_timezone_set('Asia/Kolkata');
 
 // ============================================
 // DEBUG MODE (Comment out in production)
 // ============================================
-// Uncomment below to see environment info
+// Uncomment below to see environment info (web only)
 /*
-echo "<!-- Environment: " . ENVIRONMENT . " -->\n";
-echo "<!-- Base Path: " . BASE_PATH . " -->\n";
-echo "<!-- Base URL: " . BASE_URL . " -->\n";
+if (php_sapi_name() !== 'cli') {
+    echo "<!-- Environment: " . ENVIRONMENT . " -->\n";
+    echo "<!-- Base Path: " . BASE_PATH . " -->\n";
+    echo "<!-- Base URL: " . BASE_URL . " -->\n";
+}
 */
 ?>
