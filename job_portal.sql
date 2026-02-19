@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 05, 2026 at 03:08 PM
+-- Generation Time: Feb 17, 2026 at 11:18 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -115,154 +115,14 @@ CREATE TABLE `jobs` (
 --
 
 INSERT INTO `jobs` (`id`, `notification_number`, `title`, `slug`, `total_vacancies`, `company`, `recruitment_board`, `description`, `job_link`, `official_website`, `work_mode`, `employment_type`, `experience_level`, `location`, `category`, `posted_date`, `application_deadline`, `is_active`, `created_at`, `vacancy_breakdown`, `min_qualification_id`, `required_percentage`, `age_limit_min`, `age_limit_max`, `age_relaxation`, `required_experience`, `salary_min`, `salary_max`, `pay_scale`, `allowances_details`, `selection_process`, `exam_pattern`, `notification_date`, `last_date_to_apply`, `exam_date`, `result_date`, `eligibility_cutoff_date`, `application_fee_general`, `application_fee_obc`, `application_fee_sc_st`, `payment_mode`, `notification_pdf`, `syllabus_pdf`, `admit_card_link`, `answer_key_link`, `job_category_id`, `work_mode_id`, `employment_type_id`, `experience_level_id`, `state_id`, `department_id`, `important_instructions`, `how_to_apply_steps`, `short_info`, `view_count`, `apply_click_count`, `updated_at`) VALUES
-(1, NULL, 'Software Employee', 'software-employee-at-stanny', NULL, 'stanny', NULL, '', 'https://docs.google.com/forms/d/e/1FAIpQLScZC8OuWE34o41AQMwjeVdte7kbqtsZhjxF-s43W8Xrc0hrpg/viewform?vc=0&amp;amp;amp;amp;amp;c=0&amp;amp;amp;amp;amp;w=1&amp;amp;amp;amp;amp;flr=0', NULL, 'Work from Home', 'Part-time', 'Freshers', 'Remote', 'IT', '2026-01-02', '2026-01-05', 1, '2026-01-02 15:28:29', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Online', NULL, NULL, NULL, NULL, 28, 2, 1, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, '2026-01-05 13:40:04');
--- Row 2: Bank of India Credit Officer
-INSERT INTO `jobs` (
-    `id`, `notification_number`, `title`, `slug`, `total_vacancies`, 
-    `company`, `recruitment_board`, `description`, `job_link`, `official_website`, 
-    `work_mode`, `employment_type`, `experience_level`, `location`, `category`, 
-    `posted_date`, `application_deadline`, `is_active`, `created_at`, `vacancy_breakdown`, 
-    `min_qualification_id`, `required_percentage`, `age_limit_min`, `age_limit_max`, `age_relaxation`, 
-    `required_experience`, `salary_min`, `salary_max`, `pay_scale`, `allowances_details`, 
-    `selection_process`, `exam_pattern`, `notification_date`, `last_date_to_apply`, `exam_date`, 
-    `result_date`, `eligibility_cutoff_date`, `application_fee_general`, `application_fee_obc`, `application_fee_sc_st`, 
-    `payment_mode`, `notification_pdf`, `syllabus_pdf`, `admit_card_link`, `answer_key_link`, 
-    `job_category_id`, `work_mode_id`, `employment_type_id`, `experience_level_id`, `state_id`, 
-    `department_id`, `important_instructions`, `how_to_apply_steps`, `short_info`, `view_count`, 
-    `apply_click_count`, `updated_at`
-) VALUES (
-    2, 
-    'BOI/CO/GB/2025-26', 
-    'Credit Officer - General Banking', 
-    'credit-officer-general-banking-at-bank-of-india', 
-    NULL,
-    'Bank of India', 
-    'IBPS', 
-    'Candidates, intending to apply for the post of Credit Officer (General Banking) should ensure that they fulfil the minimum eligibility criteria specified by Bank for respective post:\r\n\r\nI. Nationality / Citizenship:\r\nA candidate must be either -\r\n(i) a Citizen of India or\r\n(ii) a subject of Nepal or\r\n(iii) a subject of Bhutan or\r\n(iv) a Tibetan Refugee who came over to India before 1st January 1962 with the intention of permanently settling in India or\r\n(v) a person of Indian origin who has migrated from Pakistan, Burma, Sri Lanka, East African countries of Kenya, Uganda, the United Republic of Tanzania (formerly Tanganyika and Zanzibar), Zambia, Malawi, Zaire, Ethiopia and Vietnam with the intention of permanently settling in India, provided that a candidate belonging to categories (ii), (iii), (iv) & (v) above shall be a person in whose favour a certificate of eligibility has been issued by the Government of India\r\n\r\nGraduation / Professional qualification as prescribed for Credit Officers\r\nMinimum 60% marks for General/EWS and 55% marks for SC/ST/OBC/PwBD\r\nCandidates must meet eligibility as on 01-11-2025\r\nCandidates previously employed in the same post in BOI are not eligible\r\n\r\nRelaxation of Upper age limit:\r\n- SC/ST: 5 years\r\n- OBC (Non-creamy layer): 3 years\r\n- PwBD: 10 years\r\n- Ex-Servicemen: As per rules', 
-    'https://ibpsreg.ibps.in/boinov25/', 
-    'https://www.bankofindia.co.in/', 
-    NULL, 
-    NULL, 
-    NULL, 
-    'Various', 
-    NULL, 
-    '2025-12-20', 
-    '2026-01-05', 
-    1, 
-    '2026-01-05 04:11:43', 
-    NULL,
-    NULL, 
-    55.00, 
-    NULL, 
-    NULL, 
-    'SC/ST: 5 years, OBC: 3 years, PwBD: 10 years, Ex-Servicemen: As per rules', 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    'Online Examination', 
-    NULL, 
-    '2025-12-20', 
-    '2026-01-05', 
-    NULL, 
-    NULL, 
-    '2025-11-01', 
-    NULL, 
-    NULL, 
-    NULL, 
-    'Online', 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    17, 
-    1, 
-    2, 
-    1, 
-    NULL, 
-    NULL, 
-    'Candidates must ensure they meet eligibility criteria before applying', 
-    NULL, 
-    'Bank of India Credit Officer Recruitment 2025-26', 
-    0, 
-    0, 
-    '2026-01-05 04:11:43'
-);
-
--- Row 3: Haryana Police Constable
-INSERT INTO `jobs` (
-    `id`, `notification_number`, `title`, `slug`, `total_vacancies`, 
-    `company`, `recruitment_board`, `description`, `job_link`, `official_website`, 
-    `work_mode`, `employment_type`, `experience_level`, `location`, `category`, 
-    `posted_date`, `application_deadline`, `is_active`, `created_at`, `vacancy_breakdown`, 
-    `min_qualification_id`, `required_percentage`, `age_limit_min`, `age_limit_max`, `age_relaxation`, 
-    `required_experience`, `salary_min`, `salary_max`, `pay_scale`, `allowances_details`, 
-    `selection_process`, `exam_pattern`, `notification_date`, `last_date_to_apply`, `exam_date`, 
-    `result_date`, `eligibility_cutoff_date`, `application_fee_general`, `application_fee_obc`, `application_fee_sc_st`, 
-    `payment_mode`, `notification_pdf`, `syllabus_pdf`, `admit_card_link`, `answer_key_link`, 
-    `job_category_id`, `work_mode_id`, `employment_type_id`, `experience_level_id`, `state_id`, 
-    `department_id`, `important_instructions`, `how_to_apply_steps`, `short_info`, `view_count`, 
-    `apply_click_count`, `updated_at`
-) VALUES (
-    3, 
-    'HSSC Advt. 01/2026', 
-    'Police Constable (Male & Female)', 
-    'police-constable-male-female-at-haryana-police', 
-    5500,
-    'Haryana Police', 
-    'HSSC', 
-    'Online applications are invited for direct recruitment for 5500 posts of Police department from the Common Eligibility Test (CET) of Group-C qualified candidates.\r\n\r\nEssential Qualification (For Category No. 1 to 3):\r\ni) 10+2 from a recognized education Board/Institution.\r\nii) Hindi/Sanskrit up to Matric standard or higher education.\r\niii) No extra weightage will be given for any higher education.\r\n\r\nPost Details:\r\n1. Male Constable (General Duty) - 4500 Posts\r\n2. Female Constable (General Duty) - 600 Posts\r\n3. Male Constable (GRP) - 400 Posts\r\n\r\nThe Recruitment will be made strictly in accordance with CET Policy for Group C dated 31.12.2024 & its amendment dated 11.07.2025, HSSC Rules 2025 dated 27.05.2025 and the relevant Service Rules as per Provision contained in rule 12.14 to 12.19 of Punjab Police Rules, 1934 as applicable to Haryana State and Haryana Police (Non-Gazetted and other ranks) Rules 2017, amended from time to time.', 
-    'https://adv012026.hryssc.com/', 
-    'https://hssc.gov.in/', 
-    NULL, 
-    NULL, 
-    NULL, 
-    'Haryana', 
-    NULL, 
-    '2026-01-01', 
-    '2026-01-25', 
-    1, 
-    '2026-01-05 04:27:46', 
-    'Male Constable (GD): 4500, Female Constable (GD): 600, Male Constable (GRP): 400',
-    2, 
-    NULL, 
-    NULL, 
-    NULL, 
-    'SC/ST: 5 years, OBC: 3 years, PwBD: 10 years, Ex-Servicemen: As per rules', 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    'CET (Common Eligibility Test) + Physical Tests', 
-    'CET Group-C Exam Pattern', 
-    '2026-01-01', 
-    '2026-01-25', 
-    NULL, 
-    NULL, 
-    NULL, 
-    0.00, 
-    0.00, 
-    0.00, 
-    'No fee required', 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    16, 
-    1, 
-    2, 
-    1, 
-    10, 
-    NULL, 
-    'The candidates who earlier applied in Advt. 14/2024 must apply fresh for this advertisement.', 
-    'Visit https://adv012026.hryssc.com/ and fill online application form between 11.01.2026 to 25.01.2026 till 11:59 PM', 
-    'HSSC Haryana Police Constable Recruitment - 5500 Posts', 
-    0, 
-    0, 
-    '2026-01-05 04:27:46'
-);
+(3, NULL, 'RRB Group D Level-1 Recruitment 2026', 'sbi-specialist-cadre-officers-2026', 22000, 'Railway Recruitment Board', NULL, 'Railway Recruitment Board conducts recruitment for Group D Level-1 posts across all Indian Railways. This includes Track Maintainer, Helper, Porter, and other technical and non-technical positions.', 'https://rrbonlinereg.in', 'https://rrbonlinereg.in', 'On-site', 'Full-time', 'Freshers', 'All India - Various Railway Zones', NULL, '2026-01-07', '2026-02-20', 1, '2026-01-09 04:59:24', NULL, 1, NULL, 18, 33, NULL, NULL, 18000.00, NULL, NULL, NULL, NULL, NULL, '2026-01-07', '2026-02-20', '2026-04-15', '2026-06-30', NULL, 500.00, 250.00, 0.00, 'Online', NULL, NULL, NULL, NULL, 6, 2, 6, 1, 37, 3, NULL, NULL, NULL, 1, 0, '2026-02-14 05:43:18'),
+(4, NULL, 'SBI Specialist Cadre Officers 2026', 'ncert-various-non-academic-posts-2026', 1146, 'State Bank of India', NULL, 'State Bank of India invites applications for Specialist Cadre Officer posts in various domains including IT, Risk Management, Economist, Chartered Accountant, Company Secretary and other specialized roles.', 'https://sbi.co.in/careers', 'https://www.sbi.co.in', 'On-site', 'Full-time', 'Freshers', 'Pan India', NULL, '2026-01-07', '2026-01-10', 1, '2026-01-09 04:59:24', NULL, 27, NULL, 21, 35, NULL, NULL, 50000.00, NULL, NULL, NULL, NULL, NULL, '2026-01-07', '2026-01-10', '2026-02-15', '2026-03-30', NULL, 750.00, 100.00, 0.00, 'Online', NULL, NULL, NULL, NULL, 4, 2, 6, 4, 37, 5, NULL, NULL, NULL, 0, 0, '2026-01-09 05:03:19'),
+(5, NULL, 'NCERT Various Non-Academic Posts 2026', 'indian-army-ssc-technical-men-2026', 173, 'National Council of Educational Research and Training', NULL, 'NCERT invites applications for various Non-Academic positions including Junior Engineer, Assistant, Accountant, Library Attendant, and other administrative and technical posts.', 'https://ncert.nic.in/career', 'https://ncert.nic.in', 'On-site', 'Full-time', 'Freshers', 'New Delhi', NULL, '2026-01-07', '2026-02-16', 1, '2026-01-09 04:59:24', NULL, 27, NULL, 18, 35, NULL, NULL, 35000.00, NULL, NULL, NULL, NULL, NULL, '2026-01-07', '2026-02-16', '2026-03-20', '2026-04-30', NULL, 100.00, 100.00, 0.00, 'Online', NULL, NULL, NULL, NULL, 1, 2, 6, 1, 29, NULL, NULL, NULL, NULL, 3, 0, '2026-01-13 05:24:19'),
+(6, NULL, 'Indian Army SSC Technical 67th Course Men - 2026', 'nalco-graduate-engineer-trainee-2026', 350, 'Indian Army', NULL, 'Indian Army invites applications from unmarried male Engineering graduates for Short Service Commission in Technical Entry Scheme. Selected candidates will be commissioned as Lieutenant in the Indian Army.', 'https://joinindianarmy.nic.in', 'https://joinindianarmy.nic.in', 'On-site', 'Full-time', 'Freshers', 'Various Army Centers', NULL, '2026-01-07', '2026-02-05', 1, '2026-01-09 04:59:24', NULL, 5, NULL, 20, 27, NULL, NULL, 56100.00, NULL, NULL, NULL, NULL, NULL, '2026-01-07', '2026-02-05', '2026-04-15', '2026-05-30', NULL, 0.00, 0.00, 0.00, 'Free', NULL, NULL, NULL, NULL, 5, 2, 4, 1, 37, 8, NULL, NULL, NULL, 28, 0, '2026-01-13 05:24:32'),
+(7, NULL, 'NALCO Graduate Engineer Trainee 2026', 'iocl-apprentice-recruitment-2026', 110, 'National Aluminium Company Limited', NULL, 'NALCO recruits Graduate Engineer Trainees in disciplines like Mechanical, Electrical, Electronics, Chemical, Metallurgy, Mining, and Civil Engineering for operations across Odisha and other locations.', 'https://nalcoindia.com/careers', 'https://www.nalcoindia.com', 'On-site', 'Full-time', 'Freshers', 'Bhubaneswar, Angul, Damanjodi', NULL, '2025-12-30', '2026-01-22', 1, '2026-01-09 04:59:24', NULL, 5, NULL, 18, 30, NULL, NULL, 50000.00, NULL, NULL, NULL, NULL, NULL, '2025-12-30', '2026-01-22', '2026-03-10', '2026-04-15', NULL, 1000.00, 500.00, 0.00, 'Online', NULL, NULL, NULL, NULL, 3, 2, 1, 1, 19, NULL, NULL, NULL, NULL, 8, 0, '2026-01-09 07:19:22'),
+(8, NULL, 'IOCL Apprentice Recruitment 2026', 'ssc-grade-c-stenographer-2026', 501, 'Indian Oil Corporation Limited', NULL, 'Indian Oil Corporation Limited recruits Trade, Technician and Graduate Apprentices across marketing divisions in Northern and Eastern regions for one year apprenticeship training.', 'https://iocl.com/apprentice', 'https://www.iocl.com', 'On-site', 'Full-time', 'Freshers', 'Northern and Eastern Regions', NULL, '2026-01-07', '2026-01-12', 1, '2026-01-09 04:59:24', NULL, 27, NULL, 18, 24, NULL, NULL, 9000.00, NULL, NULL, NULL, NULL, NULL, '2026-01-07', '2026-01-12', NULL, '2026-02-28', NULL, 0.00, 0.00, 0.00, 'Free', NULL, NULL, NULL, NULL, 20, 2, 3, 1, 37, NULL, NULL, NULL, NULL, 11, 0, '2026-01-09 09:14:08'),
+(9, NULL, 'SSC Grade C Stenographer 2026', 'bsf-constable-recruitment-2026', 326, 'Staff Selection Commission', NULL, 'Staff Selection Commission conducts recruitment for Grade C Stenographer posts in various Central Government Ministries and Departments. Candidates should have stenography skills.', 'https://ssc.nic.in', 'https://ssc.nic.in', 'On-site', 'Full-time', 'Freshers', 'All India', NULL, '2025-12-23', '2026-01-11', 1, '2026-01-09 04:59:24', NULL, 2, NULL, 18, 30, NULL, NULL, 44900.00, NULL, NULL, NULL, NULL, NULL, '2025-12-23', '2026-01-11', '2026-03-15', '2026-04-30', NULL, 100.00, 100.00, 0.00, 'Online', NULL, NULL, NULL, NULL, 12, 2, 6, 1, 37, 1, NULL, NULL, NULL, 0, 0, '2026-01-09 05:03:19'),
+(10, NULL, 'BSF Constable Recruitment 2026', NULL, 549, 'Border Security Force', NULL, 'Border Security Force invites applications for Constable positions. Selected candidates will serve on India borders protecting national security. Physical fitness and medical standards apply.', 'https://bsf.nic.in', 'https://www.bsf.nic.in', 'On-site', 'Full-time', 'Freshers', 'Various BSF Locations', NULL, '2025-12-22', '2026-01-15', 1, '2026-01-09 04:59:24', NULL, 1, NULL, 18, 23, NULL, NULL, 21700.00, NULL, NULL, NULL, NULL, NULL, '2025-12-22', '2026-01-15', '2026-03-01', '2026-04-15', NULL, 0.00, 0.00, 0.00, 'Free', NULL, NULL, NULL, NULL, 9, 2, 6, 1, 37, 11, NULL, NULL, NULL, 0, 0, '2026-01-09 04:59:24');
 
 -- --------------------------------------------------------
 
@@ -455,7 +315,8 @@ INSERT INTO `master_experience_levels` (`id`, `level_name`, `icon`, `display_ord
 (3, '1-2 years', '📈', 3, 1, '2026-01-05 06:45:30', NULL),
 (4, '2-5 years', '💼', 4, 1, '2026-01-05 06:45:30', NULL),
 (5, '5-10 years', '🏆', 5, 1, '2026-01-05 06:45:30', NULL),
-(6, '10+ years', '👔', 6, 1, '2026-01-05 06:45:30', NULL);
+(6, '10+ years', '👔', 6, 1, '2026-01-05 06:45:30', NULL),
+(7, 'Not Applicable', '🛇', 1, 1, '2026-01-07 06:16:23', NULL);
 
 -- --------------------------------------------------------
 
@@ -480,7 +341,7 @@ CREATE TABLE `master_job_categories` (
 --
 
 INSERT INTO `master_job_categories` (`id`, `category_name`, `category_slug`, `icon`, `description`, `display_order`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Government', 'government', '🏛️', '', 1, 1, '2026-01-05 06:45:30', '2026-01-05 11:46:23'),
+(1, 'Government', 'government', '🏛️', '', 1, 1, '2026-01-05 06:45:30', '2026-01-07 06:01:56'),
 (2, 'Private Sector', 'private-sector', '🏢', NULL, 2, 1, '2026-01-05 06:45:30', '2026-01-05 06:45:30'),
 (3, 'Public Sector Undertaking (PSU)', 'psu', '🏭', NULL, 3, 1, '2026-01-05 06:45:30', '2026-01-05 06:45:30'),
 (4, 'Banking', 'banking', '🏦', NULL, 4, 1, '2026-01-05 06:45:30', '2026-01-05 06:45:30'),
@@ -644,6 +505,174 @@ INSERT INTO `master_work_modes` (`id`, `mode_name`, `icon`, `display_order`, `is
 (3, 'Hybrid', '🔄', 3, 1, '2026-01-05 06:45:30', NULL),
 (4, 'Field Work', '🚗', 4, 1, '2026-01-05 06:45:30', NULL);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `saved_jobs`
+--
+
+CREATE TABLE `saved_jobs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `job_id` int(11) NOT NULL,
+  `saved_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `phone` varchar(15) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `profile_photo` varchar(255) DEFAULT NULL,
+  `resume_path` varchar(255) DEFAULT NULL,
+  `bio` text DEFAULT NULL,
+  `linkedin_url` varchar(255) DEFAULT NULL,
+  `github_url` varchar(255) DEFAULT NULL,
+  `portfolio_url` varchar(255) DEFAULT NULL,
+  `total_experience_years` int(11) DEFAULT 0,
+  `current_company` varchar(100) DEFAULT NULL,
+  `current_designation` varchar(100) DEFAULT NULL,
+  `preferred_job_type_id` int(11) DEFAULT NULL COMMENT 'FK to master_employment_types',
+  `preferred_work_mode_id` int(11) DEFAULT NULL COMMENT 'FK to master_work_modes',
+  `expected_salary_min` decimal(10,2) DEFAULT NULL,
+  `expected_salary_max` decimal(10,2) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `email_verified` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_login` timestamp NULL DEFAULT NULL,
+  `job_alert_email` tinyint(1) DEFAULT 1 COMMENT 'Email notifications for matching jobs',
+  `preferred_locations` text DEFAULT NULL COMMENT 'Comma-separated preferred locations',
+  `willing_to_relocate` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `full_name`, `email`, `password_hash`, `phone`, `location`, `profile_photo`, `resume_path`, `bio`, `linkedin_url`, `github_url`, `portfolio_url`, `total_experience_years`, `current_company`, `current_designation`, `preferred_job_type_id`, `preferred_work_mode_id`, `expected_salary_min`, `expected_salary_max`, `is_active`, `email_verified`, `created_at`, `updated_at`, `last_login`, `job_alert_email`, `preferred_locations`, `willing_to_relocate`) VALUES
+(2, 'siva', 'techlume111@gmail.com', '$2y$12$0uCTqz0SADQbWz24utA/GOnJ9cIRNhZcYPjOkIZUAJJFEmitffxvi', '8500721069', 'Delhi', 'profile_2_1771052874.png', 'resume_2_1771215420.pdf', '', '', '', '', 2, '', 'Junior Developer', NULL, 1, NULL, NULL, 1, 0, '2026-02-14 06:09:33', '2026-02-16 04:50:19', '2026-02-14 06:09:41', 1, 'pune', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_education`
+--
+
+CREATE TABLE `user_education` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `degree` varchar(100) NOT NULL,
+  `institution` varchar(200) NOT NULL,
+  `field_of_study` varchar(100) DEFAULT NULL,
+  `start_year` year(4) DEFAULT NULL,
+  `end_year` year(4) DEFAULT NULL,
+  `percentage_cgpa` varchar(10) DEFAULT NULL,
+  `is_current` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_education`
+--
+
+INSERT INTO `user_education` (`id`, `user_id`, `degree`, `institution`, `field_of_study`, `start_year`, `end_year`, `percentage_cgpa`, `is_current`, `created_at`) VALUES
+(2, 2, 'btech', 'iit', 'cse', '2025', '2026', '11', 0, '2026-02-16 04:23:43');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_experience`
+--
+
+CREATE TABLE `user_experience` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `company_name` varchar(100) NOT NULL,
+  `designation` varchar(100) NOT NULL,
+  `employment_type` enum('Full-time','Part-time','Contract','Internship','Freelance') DEFAULT 'Full-time',
+  `location` varchar(100) DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `is_current` tinyint(1) DEFAULT 0,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_experience`
+--
+
+INSERT INTO `user_experience` (`id`, `user_id`, `company_name`, `designation`, `employment_type`, `location`, `start_date`, `end_date`, `is_current`, `description`, `created_at`) VALUES
+(1, 2, 'TCS', 'SE', 'Part-time', 'Ahmedabad, Gujarat', '2025-06-16', NULL, 1, '', '2026-02-16 12:40:47');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_job_preferences`
+--
+
+CREATE TABLE `user_job_preferences` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `job_category_id` int(11) NOT NULL,
+  `priority` tinyint(4) DEFAULT 1 COMMENT '1=Low, 2=Medium, 3=High',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_job_preferences`
+--
+
+INSERT INTO `user_job_preferences` (`id`, `user_id`, `job_category_id`, `priority`, `created_at`) VALUES
+(2, 2, 28, 3, '2026-02-16 04:49:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+CREATE TABLE `user_sessions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `session_token` varchar(255) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `expires_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_skills`
+--
+
+CREATE TABLE `user_skills` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `skill_name` varchar(100) NOT NULL,
+  `proficiency_level` enum('Beginner','Intermediate','Advanced','Expert') DEFAULT 'Intermediate',
+  `years_of_experience` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_skills`
+--
+
+INSERT INTO `user_skills` (`id`, `user_id`, `skill_name`, `proficiency_level`, `years_of_experience`, `created_at`) VALUES
+(2, 2, 'PHP', 'Beginner', 1, '2026-02-16 04:50:40');
+
 --
 -- Indexes for dumped tables
 --
@@ -761,6 +790,72 @@ ALTER TABLE `master_work_modes`
   ADD KEY `idx_active` (`is_active`);
 
 --
+-- Indexes for table `saved_jobs`
+--
+ALTER TABLE `saved_jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_save` (`user_id`,`job_id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_job_id` (`job_id`),
+  ADD KEY `idx_saved_at` (`saved_at`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_active` (`is_active`),
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_location` (`location`),
+  ADD KEY `fk_user_job_type` (`preferred_job_type_id`),
+  ADD KEY `fk_user_work_mode` (`preferred_work_mode_id`);
+
+--
+-- Indexes for table `user_education`
+--
+ALTER TABLE `user_education`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_end_year` (`end_year`);
+
+--
+-- Indexes for table `user_experience`
+--
+ALTER TABLE `user_experience`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_is_current` (`is_current`),
+  ADD KEY `idx_end_date` (`end_date`);
+
+--
+-- Indexes for table `user_job_preferences`
+--
+ALTER TABLE `user_job_preferences`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_preference` (`user_id`,`job_category_id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_category_id` (`job_category_id`);
+
+--
+-- Indexes for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `session_token` (`session_token`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_token` (`session_token`),
+  ADD KEY `idx_expires` (`expires_at`);
+
+--
+-- Indexes for table `user_skills`
+--
+ALTER TABLE `user_skills`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_skill_name` (`skill_name`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -774,7 +869,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `job_documents`
@@ -816,7 +911,7 @@ ALTER TABLE `master_employment_types`
 -- AUTO_INCREMENT for table `master_experience_levels`
 --
 ALTER TABLE `master_experience_levels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `master_job_categories`
@@ -843,6 +938,48 @@ ALTER TABLE `master_work_modes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `saved_jobs`
+--
+ALTER TABLE `saved_jobs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `user_education`
+--
+ALTER TABLE `user_education`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `user_experience`
+--
+ALTER TABLE `user_experience`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `user_job_preferences`
+--
+ALTER TABLE `user_job_preferences`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_skills`
+--
+ALTER TABLE `user_skills`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -863,145 +1000,53 @@ ALTER TABLE `job_important_dates`
 --
 ALTER TABLE `job_vacancies_breakdown`
   ADD CONSTRAINT `job_vacancies_breakdown_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `saved_jobs`
+--
+ALTER TABLE `saved_jobs`
+  ADD CONSTRAINT `fk_saved_job` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_saved_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_user_job_type` FOREIGN KEY (`preferred_job_type_id`) REFERENCES `master_employment_types` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_user_work_mode` FOREIGN KEY (`preferred_work_mode_id`) REFERENCES `master_work_modes` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `user_education`
+--
+ALTER TABLE `user_education`
+  ADD CONSTRAINT `fk_education_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_experience`
+--
+ALTER TABLE `user_experience`
+  ADD CONSTRAINT `fk_experience_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_job_preferences`
+--
+ALTER TABLE `user_job_preferences`
+  ADD CONSTRAINT `fk_pref_category` FOREIGN KEY (`job_category_id`) REFERENCES `master_job_categories` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pref_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD CONSTRAINT `fk_session_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_skills`
+--
+ALTER TABLE `user_skills`
+  ADD CONSTRAINT `fk_skill_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
-
-
-
--- ============================================
--- CANDIDATE MANAGEMENT SYSTEM
--- Database Tables for Job Portal
--- Run this in phpMyAdmin
--- ============================================
-
--- 1. Users/Candidates Table
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `full_name` VARCHAR(100) NOT NULL,
-  `email` VARCHAR(100) NOT NULL,
-  `password_hash` VARCHAR(255) NOT NULL,
-  `phone` VARCHAR(15) DEFAULT NULL,
-  `location` VARCHAR(100) DEFAULT NULL,
-  `profile_photo` VARCHAR(255) DEFAULT NULL,
-  `resume_path` VARCHAR(255) DEFAULT NULL,
-  `bio` TEXT DEFAULT NULL,
-  `linkedin_url` VARCHAR(255) DEFAULT NULL,
-  `github_url` VARCHAR(255) DEFAULT NULL,
-  `portfolio_url` VARCHAR(255) DEFAULT NULL,
-  `total_experience_years` INT DEFAULT 0,
-  `current_company` VARCHAR(100) DEFAULT NULL,
-  `current_designation` VARCHAR(100) DEFAULT NULL,
-  `preferred_job_type_id` INT DEFAULT NULL COMMENT 'FK to master_employment_types',
-  `preferred_work_mode_id` INT DEFAULT NULL COMMENT 'FK to master_work_modes',
-  `expected_salary_min` DECIMAL(10,2) DEFAULT NULL,
-  `expected_salary_max` DECIMAL(10,2) DEFAULT NULL,
-  `is_active` TINYINT(1) DEFAULT 1,
-  `email_verified` TINYINT(1) DEFAULT 0,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `last_login` TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-  KEY `idx_active` (`is_active`),
-  KEY `idx_email` (`email`),
-  KEY `idx_location` (`location`),
-  CONSTRAINT `fk_user_job_type` FOREIGN KEY (`preferred_job_type_id`) 
-    REFERENCES `master_employment_types` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_user_work_mode` FOREIGN KEY (`preferred_work_mode_id`) 
-    REFERENCES `master_work_modes` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- 2. User Skills Table
-CREATE TABLE IF NOT EXISTS `user_skills` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `skill_name` VARCHAR(100) NOT NULL,
-  `proficiency_level` ENUM('Beginner', 'Intermediate', 'Advanced', 'Expert') DEFAULT 'Intermediate',
-  `years_of_experience` INT DEFAULT 0,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_skill_name` (`skill_name`),
-  CONSTRAINT `fk_skill_user` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- 3. User Education Table
-CREATE TABLE IF NOT EXISTS `user_education` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `degree` VARCHAR(100) NOT NULL,
-  `institution` VARCHAR(200) NOT NULL,
-  `field_of_study` VARCHAR(100) DEFAULT NULL,
-  `start_year` YEAR DEFAULT NULL,
-  `end_year` YEAR DEFAULT NULL,
-  `percentage_cgpa` VARCHAR(10) DEFAULT NULL,
-  `is_current` TINYINT(1) DEFAULT 0,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_end_year` (`end_year`),
-  CONSTRAINT `fk_education_user` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- 4. User Experience Table
-CREATE TABLE IF NOT EXISTS `user_experience` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `company_name` VARCHAR(100) NOT NULL,
-  `designation` VARCHAR(100) NOT NULL,
-  `employment_type` ENUM('Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance') DEFAULT 'Full-time',
-  `location` VARCHAR(100) DEFAULT NULL,
-  `start_date` DATE NOT NULL,
-  `end_date` DATE DEFAULT NULL,
-  `is_current` TINYINT(1) DEFAULT 0,
-  `description` TEXT DEFAULT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_is_current` (`is_current`),
-  KEY `idx_end_date` (`end_date`),
-  CONSTRAINT `fk_experience_user` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- 5. Saved Jobs (Bookmark Feature)
-CREATE TABLE IF NOT EXISTS `saved_jobs` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `job_id` INT(11) NOT NULL,
-  `saved_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_save` (`user_id`, `job_id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_job_id` (`job_id`),
-  KEY `idx_saved_at` (`saved_at`),
-  CONSTRAINT `fk_saved_user` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_saved_job` FOREIGN KEY (`job_id`) 
-    REFERENCES `jobs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- 6. User Sessions (Optional but recommended for security)
-CREATE TABLE IF NOT EXISTS `user_sessions` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
-  `session_token` VARCHAR(255) NOT NULL,
-  `ip_address` VARCHAR(45) DEFAULT NULL,
-  `user_agent` TEXT DEFAULT NULL,
-  `expires_at` TIMESTAMP NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `session_token` (`session_token`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_token` (`session_token`),
-  KEY `idx_expires` (`expires_at`),
-  CONSTRAINT `fk_session_user` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-

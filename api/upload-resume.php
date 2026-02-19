@@ -1,131 +1,100 @@
 <?php
-require_once '../includes/session-check.php';
+require_once '../includes/config.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ' . url('profile/edit-profile.php'));
+// Start session and check if user is logged in
+if (php_sapi_name() !== 'cli') {
+    session_start();
+}
+
+if (!isset($_SESSION['candidate_id'])) {
+    header('Location: ' . url('auth/login.php'));
     exit;
 }
 
-$userId = $candidateId;
-$errors = [];
+$userId = $_SESSION['candidate_id'];
 
-// Sanitize inputs
-$full_name = trim($_POST['full_name'] ?? '');
-$phone = trim($_POST['phone'] ?? '');
-$location = trim($_POST['location'] ?? '');
-$bio = trim($_POST['bio'] ?? '');
-$linkedin_url = trim($_POST['linkedin_url'] ?? '');
-$github_url = trim($_POST['github_url'] ?? '');
-$portfolio_url = trim($_POST['portfolio_url'] ?? '');
-$current_company = trim($_POST['current_company'] ?? '');
-$current_designation = trim($_POST['current_designation'] ?? '');
-$total_experience_years = (int)($_POST['total_experience_years'] ?? 0);
-$preferred_work_mode_id = !empty($_POST['preferred_work_mode_id']) ? (int)$_POST['preferred_work_mode_id'] : null;
-$preferred_job_type_id = !empty($_POST['preferred_job_type_id']) ? (int)$_POST['preferred_job_type_id'] : null;
-$expected_salary_min = !empty($_POST['expected_salary_min']) ? (float)$_POST['expected_salary_min'] : null;
-$expected_salary_max = !empty($_POST['expected_salary_max']) ? (float)$_POST['expected_salary_max'] : null;
-
-// Validate
-if (empty($full_name)) {
-    $errors[] = 'Full name is required';
-}
-
-if (!empty($phone) && !preg_match('/^[0-9]{10}$/', $phone)) {
-    $errors[] = 'Phone must be 10 digits';
-}
-
-// Handle profile photo upload
-$profile_photo = $currentUser['profile_photo'];
-if (!empty($_FILES['profile_photo']['name'])) {
-    $file = $_FILES['profile_photo'];
-    $allowed = ['image/jpeg', 'image/png', 'image/jpg'];
-    $maxSize = 2 * 1024 * 1024; // 2MB
-    
-    if ($file['error'] === UPLOAD_ERR_OK) {
-        if (!in_array($file['type'], $allowed)) {
-            $errors[] = 'Only JPG, JPEG, PNG images allowed';
-        } elseif ($file['size'] > $maxSize) {
-            $errors[] = 'Image must be less than 2MB';
-        } else {
-            // Generate unique filename
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = 'profile_' . $userId . '_' . time() . '.' . $extension;
-            $uploadPath = '../uploads/profile_photos/' . $filename;
-            
-            // Create directory if not exists
-            if (!is_dir('../uploads/profile_photos')) {
-                mkdir('../uploads/profile_photos', 0755, true);
-            }
-            
-            // Delete old photo if exists
-            if (!empty($currentUser['profile_photo']) && file_exists('../uploads/profile_photos/' . $currentUser['profile_photo'])) {
-                unlink('../uploads/profile_photos/' . $currentUser['profile_photo']);
-            }
-            
-            // Upload new photo
-            if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-                $profile_photo = $filename;
-            } else {
-                $errors[] = 'Failed to upload profile photo';
-            }
-        }
-    }
-}
-
-if (!empty($errors)) {
-    header('Location: ' . url('profile/edit-profile.php?error=' . urlencode(implode(', ', $errors))));
+// Check if this is a POST request with file
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_FILES['resume'])) {
+    header('Location: ' . url('profile/edit-profile.php?error=No file uploaded'));
     exit;
 }
 
-// Update database
+$file = $_FILES['resume'];
+
+// Validation
+$allowedTypes = ['application/pdf'];
+$maxSize = 5 * 1024 * 1024; // 5MB
+
+if ($file['error'] !== UPLOAD_ERR_OK) {
+    header('Location: ' . url('profile/edit-profile.php?error=Upload failed. Please try again#resume'));
+    exit;
+}
+
+// Check file type
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$mimeType = finfo_file($finfo, $file['tmp_name']);
+finfo_close($finfo);
+
+if (!in_array($mimeType, $allowedTypes) && $file['type'] !== 'application/pdf') {
+    header('Location: ' . url('profile/edit-profile.php?error=Only PDF files are allowed#resume'));
+    exit;
+}
+
+if ($file['size'] > $maxSize) {
+    header('Location: ' . url('profile/edit-profile.php?error=File size must be less than 5MB#resume'));
+    exit;
+}
+
+// Generate unique filename
+$extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+if (empty($extension)) {
+    $extension = 'pdf';
+}
+$filename = 'resume_' . $userId . '_' . time() . '.' . $extension;
+$uploadDir = __DIR__ . '/../uploads/resumes/';
+$uploadPath = $uploadDir . $filename;
+
+// Create directory if not exists
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
+
+// Get old resume path
 try {
-    $sql = "UPDATE users SET 
-            full_name = ?,
-            phone = ?,
-            location = ?,
-            bio = ?,
-            linkedin_url = ?,
-            github_url = ?,
-            portfolio_url = ?,
-            current_company = ?,
-            current_designation = ?,
-            total_experience_years = ?,
-            preferred_work_mode_id = ?,
-            preferred_job_type_id = ?,
-            expected_salary_min = ?,
-            expected_salary_max = ?,
-            profile_photo = ?
-            WHERE id = ?";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        $full_name,
-        $phone,
-        $location,
-        $bio,
-        $linkedin_url,
-        $github_url,
-        $portfolio_url,
-        $current_company,
-        $current_designation,
-        $total_experience_years,
-        $preferred_work_mode_id,
-        $preferred_job_type_id,
-        $expected_salary_min,
-        $expected_salary_max,
-        $profile_photo,
-        $userId
-    ]);
-    
-    // Update session name if changed
-    $_SESSION['candidate_name'] = $full_name;
-    
-    header('Location: ' . url('profile/edit-profile.php?success=profile_updated'));
-    exit;
-    
+    $stmt = $pdo->prepare("SELECT resume_path FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch();
+    $oldResume = $user['resume_path'] ?? '';
 } catch(PDOException $e) {
-    error_log("Profile update error: " . $e->getMessage());
-    header('Location: ' . url('profile/edit-profile.php?error=Update failed. Please try again.'));
+    error_log("Database error: " . $e->getMessage());
+    $oldResume = '';
+}
+
+// Delete old resume if exists
+if (!empty($oldResume) && file_exists($uploadDir . $oldResume)) {
+    unlink($uploadDir . $oldResume);
+}
+
+// Upload file
+if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+    // Update database
+    try {
+        $stmt = $pdo->prepare("UPDATE users SET resume_path = ? WHERE id = ?");
+        $stmt->execute([$filename, $userId]);
+        
+        header('Location: ' . url('profile/edit-profile.php?success=resume_uploaded#resume'));
+        exit;
+    } catch(PDOException $e) {
+        error_log("Resume update error: " . $e->getMessage());
+        // Delete uploaded file if database update fails
+        if (file_exists($uploadPath)) {
+            unlink($uploadPath);
+        }
+        header('Location: ' . url('profile/edit-profile.php?error=Database update failed#resume'));
+        exit;
+    }
+} else {
+    header('Location: ' . url('profile/edit-profile.php?error=File upload failed. Check folder permissions#resume'));
     exit;
 }
 ?>

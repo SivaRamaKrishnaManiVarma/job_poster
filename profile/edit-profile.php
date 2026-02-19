@@ -6,7 +6,7 @@ $userId = $candidateId;
 $success = $_GET['success'] ?? '';
 $error = $_GET['error'] ?? '';
 
-// Get all user data
+// Get user data
 $educations = $pdo->prepare("SELECT * FROM user_education WHERE user_id = ? ORDER BY end_year DESC");
 $educations->execute([$userId]);
 $educations = $educations->fetchAll(PDO::FETCH_ASSOC);
@@ -19,753 +19,1055 @@ $skills = $pdo->prepare("SELECT * FROM user_skills WHERE user_id = ? ORDER BY pr
 $skills->execute([$userId]);
 $skills = $skills->fetchAll(PDO::FETCH_ASSOC);
 
-// Get master data for dropdowns
+$preferences = $pdo->prepare("
+    SELECT ujp.*, mc.category_name, mc.icon 
+    FROM user_job_preferences ujp
+    JOIN master_job_categories mc ON ujp.job_category_id = mc.id
+    WHERE ujp.user_id = ?
+    ORDER BY ujp.priority DESC
+");
+$preferences->execute([$userId]);
+$preferences = $preferences->fetchAll(PDO::FETCH_ASSOC);
+
+// Get master data
 $workModes = getAllWorkModes($pdo, true);
 $employmentTypes = getAllEmploymentTypes($pdo, true);
+$jobCategories = getAllJobCategories($pdo, true);
 
 $pageTitle = 'Edit Profile - Job Portal';
 include '../includes/header.php';
 ?>
 
+<style>
+body {
+    background-color: #f5f7fa;
+}
+.profile-card {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+}
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #3b82f6;
+}
+.help-box {
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #1e40af;
+}
+.field-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+}
+.field-hint i {
+    margin-right: 4px;
+}
+.completion-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+.badge-complete {
+    background: #d1fae5;
+    color: #065f46;
+}
+.badge-incomplete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.upload-box {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.upload-box:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+.upload-box.uploading {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+.btn-primary-custom {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-primary-custom:hover {
+    background: #2563eb;
+    color: white;
+}
+.btn-primary-custom:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+.item-box {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+.item-box:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    color: #d1d5db;
+}
+.input-valid {
+    border-color: #10b981 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(.375em + .1875rem) center;
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+.input-invalid {
+    border-color: #ef4444 !important;
+}
+.validation-message {
+    font-size: 12px;
+    margin-top: 4px;
+}
+.validation-message.valid {
+    color: #10b981;
+}
+.validation-message.invalid {
+    color: #ef4444;
+}
+.char-counter {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: right;
+}
+.char-counter.warning {
+    color: #f59e0b;
+}
+.char-counter.danger {
+    color: #ef4444;
+}
+.skill-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #3b82f6;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    margin: 4px;
+    font-size: 14px;
+}
+.skill-tag .remove-skill {
+    margin-left: 8px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+.skill-tag .remove-skill:hover {
+    opacity: 1;
+}
+.priority-selector {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.priority-option {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.priority-option:hover {
+    border-color: #3b82f6;
+}
+.priority-option.selected {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+.progress-bar-custom {
+    height: 8px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    transition: width 0.3s ease;
+}
+</style>
+
 <div class="container py-4">
-    <div class="row">
-        <div class="col-12">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="mb-1"><i class="fas fa-user-edit me-2"></i>Edit Profile</h2>
-                    <p class="text-muted mb-0">Manage your profile information</p>
-                </div>
-                <a href="<?= url('profile/dashboard.php') ?>" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                </a>
-            </div>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Complete Your Profile</h2>
+            <p class="text-muted mb-0">Fill in your details to get better job matches</p>
+        </div>
+        <a href="<?= url('profile/dashboard.php') ?>" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+    </div>
 
-            <!-- Success/Error Messages -->
-            <?php if ($success): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <?php
-                    switch($success) {
-                        case 'profile_updated': echo 'Profile updated successfully!'; break;
-                        case 'resume_uploaded': echo 'Resume uploaded successfully!'; break;
-                        case 'education_added': echo 'Education added successfully!'; break;
-                        case 'education_deleted': echo 'Education deleted successfully!'; break;
-                        case 'experience_added': echo 'Experience added successfully!'; break;
-                        case 'experience_deleted': echo 'Experience deleted successfully!'; break;
-                        case 'skill_added': echo 'Skill added successfully!'; break;
-                        case 'skill_deleted': echo 'Skill deleted successfully!'; break;
-                        default: echo htmlspecialchars($success);
-                    }
-                    ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+    <!-- Alerts -->
+    <?php if ($success): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i>
+            <?php
+            $messages = [
+                'profile_updated' => 'Profile updated successfully!',
+                'resume_uploaded' => 'Resume uploaded successfully!',
+                'education_updated' => 'Education saved successfully!',
+                'experience_added' => 'Experience added!',
+                'experience_deleted' => 'Experience removed.',
+                'skill_added' => 'Skill added!',
+                'skill_deleted' => 'Skill removed.',
+                'preference_added' => 'Job interest added!',
+                'preference_deleted' => 'Job interest removed.',
+                'location_preferences_updated' => 'Preferences saved!'
+            ];
+            echo $messages[$success] ?? 'Saved successfully!';
+            ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($error): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <?= htmlspecialchars($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Profile Completion -->
+    <div class="profile-card">
+        <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i>Profile Completion</h5>
+        <div class="progress-bar-custom mb-3">
+            <?php 
+            $completion = getCandidateProfileCompletion($pdo, $userId);
+            ?>
+            <div class="progress-fill" style="width: <?= $completion ?>%"></div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted"><?= $completion ?>% Complete</span>
+            <?php if ($completion < 100): ?>
+                <span class="text-muted small">Complete all sections to boost your profile</span>
+            <?php else: ?>
+                <span class="text-success small"><i class="fas fa-check-circle"></i> Your profile is complete!</span>
             <?php endif; ?>
-
-            <?php if ($error): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <?= htmlspecialchars($error) ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-
-            <!-- Tabbed Interface -->
-            <div class="card border-0 shadow-sm">
-                <!-- Tab Navigation -->
-                <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab">
-                        <i class="fas fa-user me-2"></i>Basic Info
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="resume-tab" data-bs-toggle="tab" data-bs-target="#resume" type="button" role="tab">
-                        <i class="fas fa-file-pdf me-2"></i>Resume
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab">
-                        <i class="fas fa-graduation-cap me-2"></i>Education
-                        <span class="badge bg-primary rounded-pill ms-1"><?= count($educations) ?></span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="experience-tab" data-bs-toggle="tab" data-bs-target="#experience" type="button" role="tab">
-                        <i class="fas fa-briefcase me-2"></i>Experience
-                        <span class="badge bg-success rounded-pill ms-1"><?= count($experiences) ?></span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab">
-                        <i class="fas fa-code me-2"></i>Skills
-                        <span class="badge bg-info rounded-pill ms-1"><?= count($skills) ?></span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab">
-                        <i class="fas fa-heart me-2"></i>Job Interests
-                        <?php 
-                        // Get preference count
-                        $prefCountStmt = $pdo->prepare("SELECT COUNT(*) as cnt FROM user_job_preferences WHERE user_id = ?");
-                        $prefCountStmt->execute([$userId]);
-                        $prefCount = $prefCountStmt->fetch()['cnt'];
-                        ?>
-                        <span class="badge bg-danger rounded-pill ms-1"><?= $prefCount ?></span>
-                    </button>
-                </li>
-                </ul>
-
-
-                <!-- Tab Content -->
-                <div class="card-body">
-                    <div class="tab-content" id="profileTabsContent">
-                        
-                        <!-- ===== TAB 1: BASIC INFO ===== -->
-                        <div class="tab-pane fade show active" id="basic" role="tabpanel">
-                            <form method="POST" action="<?= url('api/update-profile.php') ?>" enctype="multipart/form-data">
-                                <div class="row">
-                                    <!-- Profile Photo -->
-                                    <div class="col-md-12 mb-4">
-                                        <div class="text-center">
-                                            <div class="mb-3">
-                                                <?php if (!empty($currentUser['profile_photo'])): ?>
-                                                    <img src="<?= url('uploads/profile_photos/' . htmlspecialchars($currentUser['profile_photo'])) ?>" 
-                                                         id="profilePhotoPreview"
-                                                         class="rounded-circle border" 
-                                                         width="120" height="120" 
-                                                         style="object-fit: cover;"
-                                                         alt="Profile Photo">
-                                                <?php else: ?>
-                                                    <div id="profilePhotoPreview" class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" 
-                                                         style="width: 120px; height: 120px; font-size: 3rem; font-weight: bold;">
-                                                        <?= strtoupper(substr($currentUser['full_name'], 0, 1)) ?>
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <label for="profile_photo" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-camera me-1"></i>Change Photo
-                                            </label>
-                                            <input type="file" id="profile_photo" name="profile_photo" class="d-none" accept="image/jpeg,image/png,image/jpg">
-                                            <p class="small text-muted mt-2 mb-0">Max 2MB, JPG/PNG only</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Full Name -->
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="full_name" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['full_name']) ?>" required>
-                                    </div>
-
-                                    <!-- Email (Read-only) -->
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Email Address</label>
-                                        <input type="email" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['email']) ?>" readonly disabled>
-                                        <small class="text-muted">Email cannot be changed</small>
-                                    </div>
-
-                                    <!-- Phone -->
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Phone Number</label>
-                                        <input type="tel" name="phone" class="form-control" 
-                                               pattern="[0-9]{10}" maxlength="10"
-                                               value="<?= htmlspecialchars($currentUser['phone'] ?? '') ?>" 
-                                               placeholder="10-digit mobile number">
-                                    </div>
-
-                                    <!-- Location -->
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Location</label>
-                                        <input type="text" name="location" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['location'] ?? '') ?>" 
-                                               placeholder="e.g., Mumbai, Maharashtra">
-                                    </div>
-
-                                    <!-- Bio -->
-                                    <div class="col-12 mb-3">
-                                        <label class="form-label fw-semibold">Bio / About Me</label>
-                                        <textarea name="bio" class="form-control" rows="4" 
-                                                  placeholder="Tell us about yourself, your career goals, achievements..."><?= htmlspecialchars($currentUser['bio'] ?? '') ?></textarea>
-                                        <small class="text-muted">This will be visible to recruiters</small>
-                                    </div>
-
-                                    <!-- Social Links -->
-                                    <div class="col-12 mb-3">
-                                        <h6 class="fw-bold mb-3"><i class="fas fa-link me-2"></i>Social Links (Optional)</h6>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-semibold">LinkedIn URL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
-                                            <input type="url" name="linkedin_url" class="form-control" 
-                                                   value="<?= htmlspecialchars($currentUser['linkedin_url'] ?? '') ?>" 
-                                                   placeholder="https://linkedin.com/in/username">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-semibold">GitHub URL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fab fa-github"></i></span>
-                                            <input type="url" name="github_url" class="form-control" 
-                                                   value="<?= htmlspecialchars($currentUser['github_url'] ?? '') ?>" 
-                                                   placeholder="https://github.com/username">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-semibold">Portfolio URL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                            <input type="url" name="portfolio_url" class="form-control" 
-                                                   value="<?= htmlspecialchars($currentUser['portfolio_url'] ?? '') ?>" 
-                                                   placeholder="https://yourportfolio.com">
-                                        </div>
-                                    </div>
-
-                                    <!-- Career Preferences -->
-                                    <div class="col-12 mb-3 mt-3">
-                                        <h6 class="fw-bold mb-3"><i class="fas fa-briefcase me-2"></i>Career Preferences</h6>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Current Company</label>
-                                        <input type="text" name="current_company" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['current_company'] ?? '') ?>" 
-                                               placeholder="Current employer">
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Current Designation</label>
-                                        <input type="text" name="current_designation" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['current_designation'] ?? '') ?>" 
-                                               placeholder="Current role">
-                                    </div>
-
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-semibold">Total Experience (Years)</label>
-                                        <input type="number" name="total_experience_years" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['total_experience_years'] ?? '0') ?>" 
-                                               min="0" max="50">
-                                    </div>
-
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-semibold">Preferred Work Mode</label>
-                                        <select name="preferred_work_mode_id" class="form-select">
-                                            <option value="">Select...</option>
-                                            <?php foreach ($workModes as $mode): ?>
-                                                <option value="<?= $mode['id'] ?>" 
-                                                    <?= $currentUser['preferred_work_mode_id'] == $mode['id'] ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($mode['mode_name']) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label fw-semibold">Preferred Job Type</label>
-                                        <select name="preferred_job_type_id" class="form-select">
-                                            <option value="">Select...</option>
-                                            <?php foreach ($employmentTypes as $type): ?>
-                                                <option value="<?= $type['id'] ?>" 
-                                                    <?= $currentUser['preferred_job_type_id'] == $type['id'] ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($type['type_name']) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Expected Salary (Min) ₹</label>
-                                        <input type="number" name="expected_salary_min" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['expected_salary_min'] ?? '') ?>" 
-                                               placeholder="e.g., 500000" step="1000">
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-semibold">Expected Salary (Max) ₹</label>
-                                        <input type="number" name="expected_salary_max" class="form-control" 
-                                               value="<?= htmlspecialchars($currentUser['expected_salary_max'] ?? '') ?>" 
-                                               placeholder="e.g., 800000" step="1000">
-                                    </div>
-
-                                    <!-- Submit Button -->
-                                    <div class="col-12 mt-3">
-                                        <button type="submit" class="btn btn-primary px-4">
-                                            <i class="fas fa-save me-2"></i>Save Changes
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- ===== TAB 2: RESUME ===== -->
-                        <div class="tab-pane fade" id="resume" role="tabpanel">
-                            <div class="row justify-content-center">
-                                <div class="col-md-8">
-                                    <?php if (!empty($currentUser['resume_path'])): ?>
-                                        <!-- Current Resume -->
-                                        <div class="card border-0 bg-light mb-4">
-                                            <div class="card-body p-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="me-3">
-                                                        <i class="fas fa-file-pdf fa-3x text-danger"></i>
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        <h5 class="mb-1"><?= basename($currentUser['resume_path']) ?></h5>
-                                                        <p class="text-muted mb-2">
-                                                            Uploaded on <?= date('M d, Y', strtotime($currentUser['updated_at'])) ?>
-                                                        </p>
-                                                        <div class="btn-group">
-                                                            <a href="<?= url('uploads/resumes/' . htmlspecialchars($currentUser['resume_path'])) ?>" 
-                                                               target="_blank" class="btn btn-sm btn-outline-primary">
-                                                                <i class="fas fa-eye me-1"></i>View
-                                                            </a>
-                                                            <a href="<?= url('uploads/resumes/' . htmlspecialchars($currentUser['resume_path'])) ?>" 
-                                                               download class="btn btn-sm btn-outline-secondary">
-                                                                <i class="fas fa-download me-1"></i>Download
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <!-- Upload Form -->
-                                    <div class="card border-2 border-dashed">
-                                        <div class="card-body p-4 text-center">
-                                            <form method="POST" action="<?= url('api/upload-resume.php') ?>" enctype="multipart/form-data" id="resumeForm">
-                                                <i class="fas fa-cloud-upload-alt fa-4x text-primary mb-3"></i>
-                                                <h5 class="mb-2"><?= !empty($currentUser['resume_path']) ? 'Update Resume' : 'Upload Resume' ?></h5>
-                                                <p class="text-muted mb-4">Upload your latest resume in PDF format (Max 5MB)</p>
-                                                
-                                                <input type="file" name="resume" id="resumeInput" class="d-none" accept=".pdf" required>
-                                                <label for="resumeInput" class="btn btn-primary mb-3">
-                                                    <i class="fas fa-upload me-2"></i>Choose PDF File
-                                                </label>
-                                                <div id="fileName" class="text-muted small mb-3"></div>
-                                                
-                                                <button type="submit" id="uploadBtn" class="btn btn-success" style="display: none;">
-                                                    <i class="fas fa-check me-2"></i>Upload Resume
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    <div class="alert alert-info mt-4">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        <strong>Tips for a great resume:</strong>
-                                        <ul class="mb-0 mt-2">
-                                            <li>Keep it updated with latest experience</li>
-                                            <li>Use clear section headings</li>
-                                            <li>Highlight key achievements</li>
-                                            <li>Keep it to 1-2 pages</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ===== TAB 3: EDUCATION ===== -->
-                        <div class="tab-pane fade" id="education" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Education History</h5>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEducationModal">
-                                    <i class="fas fa-plus me-2"></i>Add Education
-                                </button>
-                            </div>
-
-                            <?php if (empty($educations)): ?>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No education records added yet</h5>
-                                    <p class="text-muted">Add your educational qualifications to improve your profile</p>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEducationModal">
-                                        <i class="fas fa-plus me-2"></i>Add Your First Education
-                                    </button>
-                                </div>
-                            <?php else: ?>
-                                <div class="row">
-                                    <?php foreach ($educations as $edu): ?>
-                                        <div class="col-md-6 mb-3">
-                                            <div class="card border-0 shadow-sm h-100">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                                        <h6 class="fw-bold mb-0"><?= htmlspecialchars($edu['degree']) ?></h6>
-                                                        <button class="btn btn-sm btn-outline-danger" 
-                                                                onclick="deleteEducation(<?= $edu['id'] ?>)">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <p class="text-primary mb-2"><?= htmlspecialchars($edu['institution']) ?></p>
-                                                    <?php if (!empty($edu['field_of_study'])): ?>
-                                                        <p class="text-muted small mb-2">
-                                                            <i class="fas fa-book me-1"></i><?= htmlspecialchars($edu['field_of_study']) ?>
-                                                        </p>
-                                                    <?php endif; ?>
-                                                    <p class="text-muted small mb-2">
-                                                        <i class="fas fa-calendar me-1"></i>
-                                                        <?= htmlspecialchars($edu['start_year']) ?> - 
-                                                        <?= $edu['is_current'] ? '<span class="badge bg-success">Current</span>' : htmlspecialchars($edu['end_year']) ?>
-                                                    </p>
-                                                    <?php if (!empty($edu['percentage_cgpa'])): ?>
-                                                        <p class="text-muted small mb-0">
-                                                            <i class="fas fa-award me-1"></i>Grade: <?= htmlspecialchars($edu['percentage_cgpa']) ?>
-                                                        </p>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- ===== TAB 4: EXPERIENCE ===== -->
-                        <div class="tab-pane fade" id="experience" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Work Experience</h5>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExperienceModal">
-                                    <i class="fas fa-plus me-2"></i>Add Experience
-                                </button>
-                            </div>
-
-                            <?php if (empty($experiences)): ?>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-briefcase fa-4x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No work experience added yet</h5>
-                                    <p class="text-muted">Add your professional experience to showcase your career journey</p>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExperienceModal">
-                                        <i class="fas fa-plus me-2"></i>Add Your First Experience
-                                    </button>
-                                </div>
-                            <?php else: ?>
-                                <?php foreach ($experiences as $exp): ?>
-                                    <div class="card border-0 shadow-sm mb-3">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h5 class="fw-bold mb-1">
-                                                        <?= htmlspecialchars($exp['designation']) ?>
-                                                        <?php if ($exp['is_current']): ?>
-                                                            <span class="badge bg-success ms-2">Current</span>
-                                                        <?php endif; ?>
-                                                    </h5>
-                                                    <h6 class="text-primary mb-2"><?= htmlspecialchars($exp['company_name']) ?></h6>
-                                                    <p class="text-muted small mb-2">
-                                                        <i class="fas fa-calendar me-1"></i>
-                                                        <?= date('M Y', strtotime($exp['start_date'])) ?> - 
-                                                        <?= $exp['is_current'] ? 'Present' : date('M Y', strtotime($exp['end_date'])) ?>
-                                                        <span class="ms-3">
-                                                            <i class="fas fa-briefcase me-1"></i><?= htmlspecialchars($exp['employment_type']) ?>
-                                                        </span>
-                                                        <?php if (!empty($exp['location'])): ?>
-                                                            <span class="ms-3">
-                                                                <i class="fas fa-map-marker-alt me-1"></i><?= htmlspecialchars($exp['location']) ?>
-                                                            </span>
-                                                        <?php endif; ?>
-                                                    </p>
-                                                    <?php if (!empty($exp['description'])): ?>
-                                                        <p class="mb-0 small"><?= nl2br(htmlspecialchars($exp['description'])) ?></p>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <button class="btn btn-sm btn-outline-danger ms-2" 
-                                                        onclick="deleteExperience(<?= $exp['id'] ?>)">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- ===== TAB 5: SKILLS ===== -->
-                        <div class="tab-pane fade" id="skills" role="tabpanel">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="mb-0"><i class="fas fa-code me-2"></i>Skills & Expertise</h5>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
-                                    <i class="fas fa-plus me-2"></i>Add Skill
-                                </button>
-                            </div>
-
-                            <?php if (empty($skills)): ?>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-code fa-4x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No skills added yet</h5>
-                                    <p class="text-muted">Add your technical and soft skills to highlight your expertise</p>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
-                                        <i class="fas fa-plus me-2"></i>Add Your First Skill
-                                    </button>
-                                </div>
-                            <?php else: ?>
-                                <div class="row">
-                                    <?php 
-                                    $proficiencyColors = [
-                                        'Beginner' => 'secondary',
-                                        'Intermediate' => 'info',
-                                        'Advanced' => 'primary',
-                                        'Expert' => 'success'
-                                    ];
-                                    foreach ($skills as $skill): 
-                                        $color = $proficiencyColors[$skill['proficiency_level']] ?? 'secondary';
-                                    ?>
-                                        <div class="col-md-4 col-sm-6 mb-3">
-                                            <div class="card border-0 shadow-sm h-100">
-                                                <div class="card-body d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h6 class="mb-1 fw-bold"><?= htmlspecialchars($skill['skill_name']) ?></h6>
-                                                        <span class="badge bg-<?= $color ?>"><?= htmlspecialchars($skill['proficiency_level']) ?></span>
-                                                        <?php if ($skill['years_of_experience'] > 0): ?>
-                                                            <small class="text-muted d-block mt-1">
-                                                                <?= $skill['years_of_experience'] ?> year<?= $skill['years_of_experience'] > 1 ? 's' : '' ?>
-                                                            </small>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                    <button class="btn btn-sm btn-outline-danger" 
-                                                            onclick="deleteSkill(<?= $skill['id'] ?>)">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <!-- ===== TAB 6: JOB PREFERENCES ===== -->
-                        <div class="tab-pane fade" id="preferences" role="tabpanel">
-                            <div class="alert alert-info border-0 mb-4">
-                                <div class="d-flex align-items-start">
-                                    <i class="fas fa-info-circle fa-2x me-3 mt-1"></i>
-                                    <div>
-                                        <h6 class="mb-1 fw-bold">Get Personalized Job Recommendations</h6>
-                                        <p class="mb-0 small">Select your preferred job categories and locations. We'll show you relevant opportunities based on your interests!</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Location Preferences -->
-                            <div class="card border-0 bg-light mb-4">
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-3"><i class="fas fa-map-marker-alt text-danger me-2"></i>Location Preferences</h6>
-                                    <form method="POST" action="<?= url('api/update-location-preferences.php') ?>">
-                                        <div class="row">
-                                            <div class="col-md-8 mb-3">
-                                                <label class="form-label fw-semibold">Preferred Work Locations</label>
-                                                <input type="text" name="preferred_locations" class="form-control" 
-                                                    value="<?= htmlspecialchars($currentUser['preferred_locations'] ?? '') ?>"
-                                                    placeholder="e.g., Mumbai, Pune, Bangalore (comma-separated)">
-                                                <small class="text-muted">Enter cities where you'd like to work</small>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label fw-semibold">Willing to Relocate?</label>
-                                                <div class="form-check form-switch mt-2">
-                                                    <input class="form-check-input" type="checkbox" name="willing_to_relocate" 
-                                                        value="1" id="willing_to_relocate"
-                                                        <?= $currentUser['willing_to_relocate'] ? 'checked' : '' ?>>
-                                                    <label class="form-check-label" for="willing_to_relocate">
-                                                        Yes, I'm open to relocation
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="job_alert_email" 
-                                                        value="1" id="job_alert_email"
-                                                        <?= $currentUser['job_alert_email'] ? 'checked' : '' ?>>
-                                                    <label class="form-check-label" for="job_alert_email">
-                                                        <i class="fas fa-bell me-1"></i>Send me email alerts for matching jobs
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 mt-3">
-                                                <button type="submit" class="btn btn-primary">
-                                                    <i class="fas fa-save me-2"></i>Save Location Preferences
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Job Category Interests -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0 fw-bold"><i class="fas fa-heart text-danger me-2"></i>Interested Job Categories</h6>
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#addPreferenceModal">
-                                    <i class="fas fa-plus me-2"></i>Add Interest
-                                </button>
-                            </div>
-
-                            <?php
-                            // Get user's current preferences
-                            $preferencesStmt = $pdo->prepare("
-                                SELECT ujp.*, mc.category_name, mc.icon 
-                                FROM user_job_preferences ujp
-                                JOIN master_job_categories mc ON ujp.job_category_id = mc.id
-                                WHERE ujp.user_id = ?
-                                ORDER BY ujp.priority DESC, mc.category_name ASC
-                            ");
-                            $preferencesStmt->execute([$userId]);
-                            $userPreferences = $preferencesStmt->fetchAll(PDO::FETCH_ASSOC);
-                            ?>
-
-                            <?php if (empty($userPreferences)): ?>
-                                <div class="text-center py-5">
-                                    <i class="fas fa-heart fa-4x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No job interests added yet</h5>
-                                    <p class="text-muted mb-4">Add your preferred job categories to get personalized recommendations</p>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addPreferenceModal">
-                                        <i class="fas fa-plus me-2"></i>Add Your First Interest
-                                    </button>
-                                </div>
-                            <?php else: ?>
-                                <div class="row">
-                                    <?php 
-                                    $priorityColors = [
-                                        3 => ['color' => 'danger', 'text' => 'High Priority'],
-                                        2 => ['color' => 'warning', 'text' => 'Medium Priority'],
-                                        1 => ['color' => 'info', 'text' => 'Low Priority']
-                                    ];
-                                    foreach ($userPreferences as $pref): 
-                                        $priorityInfo = $priorityColors[$pref['priority']] ?? $priorityColors[1];
-                                    ?>
-                                        <div class="col-md-6 col-lg-4 mb-3">
-                                            <div class="card border-0 shadow-sm h-100">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                                        <div>
-                                                            <h6 class="mb-2 fw-bold">
-                                                                <i class="<?= htmlspecialchars($pref['icon']) ?> me-2"></i>
-                                                                <?= htmlspecialchars($pref['category_name']) ?>
-                                                            </h6>
-                                                            <span class="badge bg-<?= $priorityInfo['color'] ?> rounded-pill">
-                                                                <?= $priorityInfo['text'] ?>
-                                                            </span>
-                                                        </div>
-                                                        <button class="btn btn-sm btn-outline-danger" 
-                                                                onclick="deletePreference(<?= $pref['id'] ?>)">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-clock me-1"></i>Added <?= date('M d, Y', strtotime($pref['created_at'])) ?>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-
-                                <!-- Matching Jobs Preview -->
-                                <div class="card border-0 bg-light mt-4">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="fas fa-lightbulb text-warning me-2"></i>Jobs Matching Your Interests
-                                        </h6>
-                                        <?php
-                                        // Get count of matching jobs
-                                        $categoryIds = array_column($userPreferences, 'job_category_id');
-                                        $placeholders = str_repeat('?,', count($categoryIds) - 1) . '?';
-                                        
-                                        $matchingJobsStmt = $pdo->prepare("
-                                            SELECT COUNT(*) as cnt FROM jobs 
-                                            WHERE is_active = 1 
-                                            AND job_category_id IN ($placeholders)
-                                            AND (application_deadline IS NULL OR application_deadline >= CURDATE())
-                                        ");
-                                        $matchingJobsStmt->execute($categoryIds);
-                                        $matchingCount = $matchingJobsStmt->fetch()['cnt'];
-                                        ?>
-                                        
-                                        <p class="mb-3">
-                                            We found <strong class="text-success"><?= $matchingCount ?> active job<?= $matchingCount != 1 ? 's' : '' ?></strong> 
-                                            matching your interests!
-                                        </p>
-                                        
-                                        <?php if ($matchingCount > 0): ?>
-                                            <a href="<?= url('profile/recommended-jobs.php') ?>" class="btn btn-success">
-                                                <i class="fas fa-search me-2"></i>View Recommended Jobs
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
+        </div>
+        <div>
+            <span class="completion-badge <?= !empty($currentUser['full_name']) ? 'badge-complete' : 'badge-incomplete' ?>">
+                <i class="fas fa-<?= !empty($currentUser['full_name']) ? 'check' : 'times' ?>"></i> Basic Info
+            </span>
+            <span class="completion-badge <?= !empty($currentUser['resume_path']) ? 'badge-complete' : 'badge-incomplete' ?>">
+                <i class="fas fa-<?= !empty($currentUser['resume_path']) ? 'check' : 'times' ?>"></i> Resume
+            </span>
+            <span class="completion-badge <?= count($educations) > 0 ? 'badge-complete' : 'badge-incomplete' ?>">
+                <i class="fas fa-<?= count($educations) > 0 ? 'check' : 'times' ?>"></i> Education
+            </span>
+            <span class="completion-badge <?= count($experiences) > 0 ? 'badge-complete' : 'badge-incomplete' ?>">
+                <i class="fas fa-<?= count($experiences) > 0 ? 'check' : 'times' ?>"></i> Experience
+            </span>
+            <span class="completion-badge <?= count($skills) > 0 ? 'badge-complete' : 'badge-incomplete' ?>">
+                <i class="fas fa-<?= count($skills) > 0 ? 'check' : 'times' ?>"></i> Skills
+            </span>
+            <span class="completion-badge <?= count($preferences) > 0 ? 'badge-complete' : 'badge-incomplete' ?>">
+                <i class="fas fa-<?= count($preferences) > 0 ? 'check' : 'times' ?>"></i> Interests
+            </span>
         </div>
     </div>
-</div>
 
-<!-- ===== MODALS ===== -->
+    <!-- BASIC INFO -->
+    <div class="profile-card" id="basic">
+        <h4 class="section-title">
+            <i class="fas fa-user me-2 text-primary"></i>Basic Information
+        </h4>
 
-<!-- Add Education Modal -->
-<div class="modal fade" id="addEducationModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form method="POST" action="<?= url('api/add-education.php') ?>">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-graduation-cap me-2"></i>Add Education</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="help-box">
+            <i class="fas fa-info-circle me-2"></i>
+            This information helps employers contact you. Make sure your phone number and location are accurate.
+        </div>
+
+        <form method="POST" action="<?= url('api/update-profile.php') ?>" enctype="multipart/form-data" id="basic-info-form">
+            <div class="row">
+                <!-- Profile Photo -->
+                <div class="col-12 mb-4 text-center">
+                    <?php if (!empty($currentUser['profile_photo'])): ?>
+                        <img src="<?= url('uploads/profile_photos/' . $currentUser['profile_photo']) ?>" 
+                             class="rounded-circle mb-3" 
+                             width="100" height="100" 
+                             style="object-fit: cover; border: 3px solid #e5e7eb;"
+                             id="preview-img">
+                    <?php else: ?>
+                        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 100px; height: 100px; border: 3px solid #e5e7eb;"
+                             id="preview-container">
+                            <i class="fas fa-user fa-3x text-muted"></i>
+                        </div>
+                    <?php endif; ?>
+                    <div>
+                        <label for="profile_photo" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-camera me-1"></i>Upload Photo
+                        </label>
+                        <input type="file" id="profile_photo" name="profile_photo" 
+                               accept="image/jpeg,image/jpg,image/png" class="d-none" 
+                               onchange="previewAndValidatePhoto(this)">
+                        <p class="field-hint mt-2">
+                            <i class="fas fa-info-circle"></i>JPG or PNG • Max 2MB • Square photo works best
+                        </p>
+                    </div>
                 </div>
-                <div class="modal-body">
+
+                <!-- Full Name -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" name="full_name" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['full_name'] ?? '') ?>" 
+                           placeholder="Enter your complete legal name" 
+                           required 
+                           minlength="3"
+                           maxlength="100"
+                           oninput="validateName(this)">
+                    <span class="field-hint">
+                        <i class="fas fa-lightbulb"></i>Use your full name as it appears on official documents
+                    </span>
+                    <div id="name-validation" class="validation-message"></div>
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">+91</span>
+                        <input type="tel" name="phone" class="form-control" 
+                               value="<?= htmlspecialchars($currentUser['phone'] ?? '') ?>" 
+                               placeholder="10-digit mobile number" 
+                               pattern="[6-9][0-9]{9}"
+                               maxlength="10"
+                               required
+                               oninput="validatePhone(this)">
+                    </div>
+                    <span class="field-hint">
+                        <i class="fas fa-phone"></i>Enter your active mobile number (employers will call/WhatsApp you)
+                    </span>
+                    <div id="phone-validation" class="validation-message"></div>
+                </div>
+
+                <!-- Location -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Current Location</label>
+                    <input type="text" name="location" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['location'] ?? '') ?>" 
+                           placeholder="e.g., Mumbai, Maharashtra"
+                           list="indian-cities"
+                           oninput="validateLocation(this)">
+                    <datalist id="indian-cities">
+                        <option value="Mumbai, Maharashtra">
+                        <option value="Delhi, NCR">
+                        <option value="Bangalore, Karnataka">
+                        <option value="Hyderabad, Telangana">
+                        <option value="Chennai, Tamil Nadu">
+                        <option value="Kolkata, West Bengal">
+                        <option value="Pune, Maharashtra">
+                        <option value="Ahmedabad, Gujarat">
+                        <option value="Jaipur, Rajasthan">
+                        <option value="Lucknow, Uttar Pradesh">
+                    </datalist>
+                    <span class="field-hint">
+                        <i class="fas fa-map-marker-alt"></i>City where you currently live (helps find nearby jobs)
+                    </span>
+                </div>
+
+                <!-- Email (readonly) -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input type="email" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['email']) ?>" 
+                           disabled>
+                    <span class="field-hint text-muted">
+                        <i class="fas fa-lock"></i>Email cannot be changed (used for login)
+                    </span>
+                </div>
+
+                <!-- About -->
+                <div class="col-12 mb-3">
+                    <label class="form-label fw-semibold">About You (Professional Summary)</label>
+                    <textarea name="bio" class="form-control" rows="4" 
+                              maxlength="500"
+                              placeholder="Write a brief professional summary (e.g., Experienced software developer with 5 years in web development...)"
+                              oninput="updateCharCounter(this, 500, 'bio-counter')"><?= htmlspecialchars($currentUser['bio'] ?? '') ?></textarea>
+                    <div class="d-flex justify-content-between">
+                        <span class="field-hint">
+                            <i class="fas fa-edit"></i>Highlight your key skills and career goals (shown to employers)
+                        </span>
+                        <span class="char-counter" id="bio-counter">
+                            <?= strlen($currentUser['bio'] ?? '') ?>/500
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="col-12 mb-4">
+                    <label class="form-label fw-semibold mb-3">
+                        <i class="fas fa-link me-2"></i>Social Profiles (Optional but Recommended)
+                    </label>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Degree/Qualification <span class="text-danger">*</span></label>
-                            <input type="text" name="degree" class="form-control" placeholder="e.g., B.Tech, MBA" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Institution/University <span class="text-danger">*</span></label>
-                            <input type="text" name="institution" class="form-control" placeholder="e.g., IIT Delhi" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Field of Study</label>
-                            <input type="text" name="field_of_study" class="form-control" placeholder="e.g., Computer Science">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Grade/Percentage/CGPA</label>
-                            <input type="text" name="percentage_cgpa" class="form-control" placeholder="e.g., 8.5 CGPA, 85%">
-                        </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">Start Year <span class="text-danger">*</span></label>
-                            <input type="number" name="start_year" class="form-control" min="1980" max="2030" required>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">End Year</label>
-                            <input type="number" name="end_year" class="form-control" id="edu_end_year" min="1980" max="2030">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">&nbsp;</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="is_current" value="1" id="edu_is_current">
-                                <label class="form-check-label" for="edu_is_current">Currently Studying</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-linkedin text-primary"></i></span>
+                                <input type="url" name="linkedin_url" class="form-control" 
+                                       value="<?= htmlspecialchars($currentUser['linkedin_url'] ?? '') ?>" 
+                                       placeholder="LinkedIn profile URL"
+                                       oninput="validateURL(this, 'linkedin.com')">
                             </div>
+                            <span class="field-hint">
+                                <i class="fas fa-info-circle"></i>e.g., linkedin.com/in/yourname
+                            </span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fab fa-github"></i></span>
+                                <input type="url" name="github_url" class="form-control" 
+                                       value="<?= htmlspecialchars($currentUser['github_url'] ?? '') ?>" 
+                                       placeholder="GitHub profile URL"
+                                       oninput="validateURL(this, 'github.com')">
+                            </div>
+                            <span class="field-hint">
+                                <i class="fas fa-info-circle"></i>e.g., github.com/yourusername
+                            </span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <input type="url" name="portfolio_url" class="form-control" 
+                                       value="<?= htmlspecialchars($currentUser['portfolio_url'] ?? '') ?>" 
+                                       placeholder="Portfolio website URL"
+                                       oninput="validateURL(this, '')">
+                            </div>
+                            <span class="field-hint">
+                                <i class="fas fa-info-circle"></i>Your personal website or portfolio
+                            </span>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Save Education
-                    </button>
+
+                <div class="col-12 mb-3">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">
+                        <i class="fas fa-briefcase me-2 text-primary"></i>Current Employment Status
+                    </h6>
+                </div>
+
+                <!-- Current Job -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Current Company</label>
+                    <input type="text" name="current_company" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['current_company'] ?? '') ?>" 
+                           placeholder="e.g., TCS, Infosys, Google">
+                    <span class="field-hint">
+                        <i class="fas fa-building"></i>Leave blank if not currently employed
+                    </span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Current Job Title</label>
+                    <input type="text" name="current_designation" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['current_designation'] ?? '') ?>" 
+                           placeholder="e.g., Senior Developer, Marketing Manager">
+                    <span class="field-hint">
+                        <i class="fas fa-id-badge"></i>Your current role/position
+                    </span>
+                </div>
+
+                <!-- Experience Years -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Total Work Experience</label>
+                    <select name="total_experience_years" class="form-select">
+                        <option value="0" <?= ($currentUser['total_experience_years'] ?? 0) == 0 ? 'selected' : '' ?>>Fresher (No experience)</option>
+                        <?php for ($i = 1; $i <= 30; $i++): ?>
+                            <option value="<?= $i ?>" <?= ($currentUser['total_experience_years'] ?? 0) == $i ? 'selected' : '' ?>>
+                                <?= $i ?> year<?= $i > 1 ? 's' : '' ?>
+                            </option>
+                        <?php endfor; ?>
+                        <option value="30" <?= ($currentUser['total_experience_years'] ?? 0) > 30 ? 'selected' : '' ?>>30+ years</option>
+                    </select>
+                    <span class="field-hint">
+                        <i class="fas fa-clock"></i>Total years of professional work experience
+                    </span>
+                </div>
+
+                <!-- Work Mode -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Preferred Work Mode</label>
+                    <select name="preferred_work_mode_id" class="form-select">
+                        <option value="">No preference (open to all)</option>
+                        <?php foreach ($workModes as $mode): ?>
+                            <option value="<?= $mode['id'] ?>" 
+                                    <?= ($currentUser['preferred_work_mode_id'] ?? '') == $mode['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($mode['mode_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="field-hint">
+                        <i class="fas fa-laptop-house"></i>How you prefer to work (Office/Remote/Hybrid)
+                    </span>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">
+                        <i class="fas fa-rupee-sign me-2 text-success"></i>Salary Expectations
+                    </h6>
+                </div>
+
+                <!-- Salary Range -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Minimum Expected Salary (₹/year)</label>
+                    <input type="number" name="expected_salary_min" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['expected_salary_min'] ?? '') ?>" 
+                           placeholder="e.g., 300000"
+                           min="0"
+                           step="10000"
+                           oninput="validateSalary()">
+                    <span class="field-hint">
+                        <i class="fas fa-info-circle"></i>Minimum salary you're willing to accept per year
+                    </span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Maximum Expected Salary (₹/year)</label>
+                    <input type="number" name="expected_salary_max" class="form-control" 
+                           value="<?= htmlspecialchars($currentUser['expected_salary_max'] ?? '') ?>" 
+                           placeholder="e.g., 500000"
+                           min="0"
+                           step="10000"
+                           oninput="validateSalary()">
+                    <span class="field-hint">
+                        <i class="fas fa-info-circle"></i>Maximum salary you're targeting per year
+                    </span>
+                    <div id="salary-validation" class="validation-message"></div>
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn-primary-custom" id="save-basic-btn">
+                    <i class="fas fa-save me-2"></i>Save Basic Information
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- RESUME UPLOAD -->
+    <div class="profile-card" id="resume">
+        <h4 class="section-title">
+            <i class="fas fa-file-pdf me-2 text-danger"></i>Your Resume
+        </h4>
+
+        <div class="help-box">
+            <i class="fas fa-info-circle me-2"></i>
+            Upload your latest resume in PDF format. A good resume increases your chances of getting hired!
+        </div>
+
+        <?php if (!empty($currentUser['resume_path'])): ?>
+            <!-- Existing Resume -->
+            <div class="alert alert-success border-0">
+                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                        <div>
+                            <h6 class="mb-0"><?= basename($currentUser['resume_path']) ?></h6>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>Uploaded: <?= date('M d, Y', strtotime($currentUser['updated_at'])) ?>
+                            </small>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="<?= url('uploads/resumes/' . $currentUser['resume_path']) ?>" 
+                           target="_blank" class="btn btn-sm btn-outline-primary me-2 mb-2">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="<?= url('uploads/resumes/' . $currentUser['resume_path']) ?>" 
+                           download class="btn btn-sm btn-outline-success me-2 mb-2">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-warning mb-2" 
+                                onclick="showResumeUpload()">
+                            <i class="fas fa-upload"></i> Replace
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <form id="resume-form" method="POST" action="<?= url('api/upload-resume.php') ?>" 
+                  enctype="multipart/form-data" style="display: none;">
+        <?php else: ?>
+            <form id="resume-form" method="POST" action="<?= url('api/upload-resume.php') ?>" 
+                  enctype="multipart/form-data">
+        <?php endif; ?>
+            <div class="upload-box" id="upload-box" onclick="document.getElementById('resume-file').click()">
+                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3" id="upload-icon"></i>
+                <h6 class="mb-2" id="upload-text">Click to upload your resume</h6>
+                <p class="text-muted small mb-0" id="upload-hint">
+                    PDF only • Maximum 5MB • Include your latest work experience
+                </p>
+                <input type="file" id="resume-file" name="resume" 
+                       accept=".pdf,application/pdf" class="d-none" 
+                       onchange="handleResumeUpload(this)">
+            </div>
+            <div id="file-info" class="mt-3 d-none">
+                <div class="alert alert-info">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    <span id="file-name"></span> 
+                    <span id="file-size" class="text-muted ms-2"></span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- EDUCATION (Highest Qualification Only) -->
+    <div class="profile-card" id="education">
+        <h4 class="section-title">
+            <i class="fas fa-graduation-cap me-2 text-success"></i>Highest Education
+        </h4>
+
+        <div class="help-box">
+            <i class="fas fa-info-circle me-2"></i>
+            Add your highest educational qualification. This helps employers understand your academic background.
+        </div>
+
+        <?php 
+        // Get highest education (most recent)
+        $highestEdu = !empty($educations) ? $educations[0] : null;
+        ?>
+
+        <form method="POST" action="<?= url('api/update-education.php') ?>" id="education-form">
+            <div class="row">
+                <!-- Degree -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Degree/Qualification <span class="text-danger">*</span></label>
+                    <select name="degree" class="form-select" required onchange="handleDegreeChange(this)">
+                        <option value="">Select your highest degree</option>
+                        <option value="Ph.D" <?= ($highestEdu['degree'] ?? '') == 'Ph.D' ? 'selected' : '' ?>>Ph.D (Doctorate)</option>
+                        <option value="Master's Degree" <?= ($highestEdu['degree'] ?? '') == "Master's Degree" ? 'selected' : '' ?>>Master's Degree (M.Tech/MBA/M.Sc)</option>
+                        <option value="Bachelor's Degree" <?= ($highestEdu['degree'] ?? '') == "Bachelor's Degree" ? 'selected' : '' ?>>Bachelor's Degree (B.Tech/BE/BBA/B.Sc)</option>
+                        <option value="Diploma" <?= ($highestEdu['degree'] ?? '') == 'Diploma' ? 'selected' : '' ?>>Diploma (Polytechnic)</option>
+                        <option value="12th Grade" <?= ($highestEdu['degree'] ?? '') == '12th Grade' ? 'selected' : '' ?>>12th Grade (Senior Secondary)</option>
+                        <option value="10th Grade" <?= ($highestEdu['degree'] ?? '') == '10th Grade' ? 'selected' : '' ?>>10th Grade (Secondary)</option>
+                        <option value="Other" <?= !in_array($highestEdu['degree'] ?? '', ['Ph.D', "Master's Degree", "Bachelor's Degree", 'Diploma', '12th Grade', '10th Grade']) && !empty($highestEdu['degree']) ? 'selected' : '' ?>>Other</option>
+                    </select>
+                    <span class="field-hint">
+                        <i class="fas fa-graduation-cap"></i>Select your highest completed education level
+                    </span>
+                </div>
+
+                <!-- Custom Degree (if Other selected) -->
+                <div class="col-md-6 mb-3" id="custom-degree-field" style="display: <?= !empty($highestEdu['degree']) && !in_array($highestEdu['degree'], ['Ph.D', "Master's Degree", "Bachelor's Degree", 'Diploma', '12th Grade', '10th Grade']) ? 'block' : 'none' ?>;">
+                    <label class="form-label fw-semibold">Specify Degree <span class="text-danger">*</span></label>
+                    <input type="text" name="custom_degree" class="form-control" 
+                           value="<?= !in_array($highestEdu['degree'] ?? '', ['Ph.D', "Master's Degree", "Bachelor's Degree", 'Diploma', '12th Grade', '10th Grade']) ? htmlspecialchars($highestEdu['degree'] ?? '') : '' ?>"
+                           placeholder="Enter your degree name">
+                    <span class="field-hint">
+                        <i class="fas fa-edit"></i>e.g., B.Pharma, BCA, MCA, etc.
+                    </span>
+                </div>
+
+                <!-- Institution -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Institution/University <span class="text-danger">*</span></label>
+                    <input type="text" name="institution" class="form-control" 
+                           value="<?= htmlspecialchars($highestEdu['institution'] ?? '') ?>"
+                           placeholder="e.g., Mumbai University" 
+                           required>
+                    <span class="field-hint">
+                        <i class="fas fa-university"></i>Name of your college/university/school
+                    </span>
+                </div>
+
+                <!-- Field of Study -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Field of Study/Specialization</label>
+                    <input type="text" name="field_of_study" class="form-control" 
+                           value="<?= htmlspecialchars($highestEdu['field_of_study'] ?? '') ?>"
+                           placeholder="e.g., Computer Science, Mechanical Engineering">
+                    <span class="field-hint">
+                        <i class="fas fa-book"></i>Your major/stream/specialization (if applicable)
+                    </span>
+                </div>
+
+                <!-- Start Year -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Start Year <span class="text-danger">*</span></label>
+                    <select name="start_year" id="start_year" class="form-select" required onchange="validateEducationYears()">
+                        <option value="">Select year</option>
+                        <?php 
+                        $currentYear = date('Y');
+                        for ($year = $currentYear; $year >= 1960; $year--): 
+                        ?>
+                            <option value="<?= $year ?>" <?= ($highestEdu['start_year'] ?? '') == $year ? 'selected' : '' ?>>
+                                <?= $year ?>
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                    <span class="field-hint">
+                        <i class="fas fa-calendar-alt"></i>When did you start?
+                    </span>
+                </div>
+
+                <!-- End Year -->
+                <div class="col-md-4 mb-3" id="end-year-field">
+                    <label class="form-label fw-semibold">End Year / Expected</label>
+                    <select name="end_year" id="end_year" class="form-select" onchange="validateEducationYears()">
+                        <option value="">Select year</option>
+                        <?php 
+                        $futureYear = $currentYear + 6; // Allow 6 years in future for long courses
+                        for ($year = $futureYear; $year >= 1960; $year--): 
+                        ?>
+                            <option value="<?= $year ?>" <?= ($highestEdu['end_year'] ?? '') == $year ? 'selected' : '' ?>>
+                                <?= $year ?>
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                    <span class="field-hint">
+                        <i class="fas fa-calendar-check"></i>When did/will you complete?
+                    </span>
+                    <div id="year-error" class="validation-message invalid d-none">
+                        <i class="fas fa-exclamation-circle"></i> End year must be after start year
+                    </div>
+                </div>
+
+                <!-- Currently Studying -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold d-block">&nbsp;</label>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="is_current" 
+                               value="1" id="is_current" 
+                               <?= ($highestEdu['is_current'] ?? 0) ? 'checked' : '' ?>
+                               onchange="toggleEndYear(this)">
+                        <label class="form-check-label" for="is_current">
+                            <i class="fas fa-clock me-1"></i>Currently studying
+                        </label>
+                    </div>
+                    <span class="field-hint">
+                        <i class="fas fa-info-circle"></i>Check if you're still pursuing this degree
+                    </span>
+                </div>
+
+                <!-- Percentage/CGPA -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Percentage / CGPA / Grade</label>
+                    <input type="text" name="percentage_cgpa" class="form-control" 
+                           value="<?= htmlspecialchars($highestEdu['percentage_cgpa'] ?? '') ?>"
+                           placeholder="e.g., 8.5 CGPA or 85% or First Class">
+                    <span class="field-hint">
+                        <i class="fas fa-award"></i>Your academic score/grade
+                    </span>
+                </div>
+            </div>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn-primary-custom" id="save-education-btn">
+                    <i class="fas fa-save me-2"></i>Save Education
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <div class="profile-card" id="experience">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="section-title mb-0" style="border: none; padding: 0;">
+                <i class="fas fa-briefcase me-2 text-primary"></i>Work Experience
+            </h4>
+            <button class="btn btn-sm btn-primary-custom" data-bs-toggle="modal" data-bs-target="#addExperienceModal">
+                <i class="fas fa-plus me-1"></i>Add Experience
+            </button>
+        </div>
+
+        <div class="help-box">
+            <i class="fas fa-info-circle me-2"></i>
+            List your work experience, internships, or projects. Start with your most recent role. Add at least one for better job matches!
+        </div>
+
+        <?php if (empty($experiences)): ?>
+            <div class="empty-state">
+                <i class="fas fa-briefcase"></i>
+                <p class="mb-3">No work experience added yet</p>
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addExperienceModal">
+                    <i class="fas fa-plus me-1"></i>Add Your First Experience
+                </button>
+            </div>
+        <?php else: ?>
+            <?php foreach ($experiences as $exp): ?>
+                <div class="item-box">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-1">
+                                <?= htmlspecialchars($exp['designation']) ?>
+                                <?php if ($exp['is_current']): ?>
+                                    <span class="badge bg-success ms-2">
+                                        <i class="fas fa-circle-dot"></i> Current
+                                    </span>
+                                <?php endif; ?>
+                            </h6>
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-building me-1"></i><?= htmlspecialchars($exp['company_name']) ?>
+                            </p>
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-calendar me-1"></i>
+                                <?= date('M Y', strtotime($exp['start_date'])) ?> - 
+                                <?= $exp['is_current'] ? 'Present' : date('M Y', strtotime($exp['end_date'])) ?>
+                                <?php
+                                $start = new DateTime($exp['start_date']);
+                                $end = $exp['is_current'] ? new DateTime() : new DateTime($exp['end_date']);
+                                $diff = $start->diff($end);
+                                $duration = '';
+                                if ($diff->y > 0) $duration .= $diff->y . ' year' . ($diff->y > 1 ? 's' : '') . ' ';
+                                if ($diff->m > 0) $duration .= $diff->m . ' month' . ($diff->m > 1 ? 's' : '');
+                                ?>
+                                <span class="text-success">
+                                    <i class="fas fa-clock ms-2 me-1"></i><?= trim($duration) ?>
+                                </span>
+                            </small>
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-briefcase me-1"></i><?= htmlspecialchars($exp['employment_type']) ?>
+                                <?php if (!empty($exp['location'])): ?>
+                                    <i class="fas fa-map-marker-alt ms-2 me-1"></i><?= htmlspecialchars($exp['location']) ?>
+                                <?php endif; ?>
+                            </small>
+                            <?php if (!empty($exp['description'])): ?>
+                                <p class="small mb-0 text-muted">
+                                    <?= nl2br(htmlspecialchars(substr($exp['description'], 0, 200))) ?>
+                                    <?= strlen($exp['description']) > 200 ? '...' : '' ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" 
+                                onclick="if(confirm('Delete this experience? This cannot be undone.')) window.location.href='<?= url('api/delete-experience.php?id=' . $exp['id']) ?>'">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="profile-card" id="skills">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="section-title mb-0" style="border: none; padding: 0;">
+                <i class="fas fa-code me-2 text-info"></i>Skills
+            </h4>
+            <button class="btn btn-sm btn-primary-custom" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                <i class="fas fa-plus me-1"></i>Add Skill
+            </button>
+        </div>
+
+        <div class="help-box">
+            <i class="fas fa-info-circle me-2"></i>
+            Add skills relevant to your target job. Include technical skills (e.g., PHP, Java), tools (e.g., Excel, Photoshop), and soft skills (e.g., Communication, Leadership).
+        </div>
+
+        <?php if (empty($skills)): ?>
+            <div class="empty-state">
+                <i class="fas fa-code"></i>
+                <p class="mb-3">No skills added yet</p>
+                <p class="text-muted small mb-3">Add at least 5 skills to improve your profile visibility</p>
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                    <i class="fas fa-plus me-1"></i>Add Your First Skill
+                </button>
+            </div>
+        <?php else: ?>
+            <div class="d-flex flex-wrap gap-2">
+                <?php 
+                $proficiencyColors = [
+                    'Expert' => 'success',
+                    'Advanced' => 'primary',
+                    'Intermediate' => 'info',
+                    'Beginner' => 'secondary'
+                ];
+                foreach ($skills as $skill): 
+                    $color = $proficiencyColors[$skill['proficiency_level']] ?? 'secondary';
+                ?>
+                    <div class="skill-tag bg-<?= $color ?>">
+                        <span><?= htmlspecialchars($skill['skill_name']) ?></span>
+                        <?php if (!empty($skill['proficiency_level'])): ?>
+                            <small class="ms-1 opacity-75">(<?= htmlspecialchars($skill['proficiency_level']) ?>)</small>
+                        <?php endif; ?>
+                        <?php if (!empty($skill['years_of_experience']) && $skill['years_of_experience'] > 0): ?>
+                            <small class="ms-1 opacity-75">• <?= $skill['years_of_experience'] ?>y</small>
+                        <?php endif; ?>
+                        <span class="remove-skill" 
+                              onclick="if(confirm('Remove <?= htmlspecialchars($skill['skill_name']) ?>?')) window.location.href='<?= url('api/delete-skill.php?id=' . $skill['id']) ?>'">
+                            <i class="fas fa-times-circle"></i>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <p class="text-muted small mt-3 mb-0">
+                <i class="fas fa-lightbulb me-1"></i>
+                <strong>Total skills:</strong> <?= count($skills) ?> 
+                <?php if (count($skills) < 5): ?>
+                    • Add <?= 5 - count($skills) ?> more for better profile visibility
+                <?php else: ?>
+                    • Great! Your profile looks strong
+                <?php endif; ?>
+            </p>
+        <?php endif; ?>
+    </div>
+
+    <!-- JOB INTERESTS -->
+    <div class="profile-card" id="preferences">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="section-title mb-0" style="border: none; padding: 0;">
+                <i class="fas fa-heart me-2 text-danger"></i>Job Interests
+            </h4>
+            <button class="btn btn-sm btn-primary-custom" data-bs-toggle="modal" data-bs-target="#addPreferenceModal">
+                <i class="fas fa-plus me-1"></i>Add Interest
+            </button>
+        </div>
+
+        <div class="help-box">
+            <i class="fas fa-info-circle me-2"></i>
+            Select job categories you're interested in. We'll send you personalized job recommendations and email alerts based on these preferences!
+        </div>
+
+        <!-- Location Preferences -->
+        <div class="mb-4 p-3 bg-light rounded">
+            <h6 class="fw-bold mb-3">
+                <i class="fas fa-map-marker-alt me-2"></i>Location & Alert Preferences
+            </h6>
+            <form method="POST" action="<?= url('api/update-location-preferences.php') ?>">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label fw-semibold">Preferred Work Locations</label>
+                        <input type="text" name="preferred_locations" class="form-control" 
+                               value="<?= htmlspecialchars($currentUser['preferred_locations'] ?? '') ?>"
+                               placeholder="e.g., Mumbai, Pune, Bangalore">
+                        <span class="field-hint">
+                            <i class="fas fa-info-circle"></i>Comma-separated city names where you want to work
+                        </span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Options</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="willing_to_relocate" 
+                                   value="1" id="relocate" <?= $currentUser['willing_to_relocate'] ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="relocate">
+                                <i class="fas fa-plane me-1"></i>Willing to relocate
+                            </label>
+                        </div>
+                        <span class="field-hint">Open to moving to other cities</span>
+                        
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="job_alert_email" 
+                                   value="1" id="alerts" <?= $currentUser['job_alert_email'] ? 'checked' : '' ?>>
+                            <!-- <label class="form-check-label" for="alerts">
+                                <i class="fas fa-envelope me-1"></i>Email job alerts  #Hiding for now not implemented
+                            </label> -->
+                        </div>
+                        <span class="field-hint">Get daily job recommendations via email</span>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-sm btn-primary-custom">
+                            <i class="fas fa-save me-1"></i>Save Preferences
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
+
+        <!-- Job Category Interests -->
+        <?php if (empty($preferences)): ?>
+            <div class="empty-state">
+                <i class="fas fa-heart"></i>
+                <p class="mb-3">No job interests added yet</p>
+                <p class="text-muted small mb-3">Add at least 2-3 interests to get personalized job recommendations</p>
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPreferenceModal">
+                    <i class="fas fa-plus me-1"></i>Add Your First Interest
+                </button>
+            </div>
+        <?php else: ?>
+            <div class="row">
+                <?php 
+                $priorityInfo = [
+                    3 => ['color' => 'danger', 'text' => 'High Priority', 'icon' => 'fas fa-fire'],
+                    2 => ['color' => 'warning', 'text' => 'Medium Priority', 'icon' => 'fas fa-star'],
+                    1 => ['color' => 'info', 'text' => 'Low Priority', 'icon' => 'fas fa-star-half-alt']
+                ];
+                foreach ($preferences as $pref): 
+                    $info = $priorityInfo[$pref['priority']] ?? $priorityInfo[1];
+                ?>
+                    <div class="col-md-4 mb-3">
+                        <div class="item-box h-100">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="<?= htmlspecialchars($pref['icon']) ?> me-2"></i>
+                                        <?= htmlspecialchars($pref['category_name']) ?>
+                                    </h6>
+                                    <span class="badge bg-<?= $info['color'] ?>">
+                                        <i class="<?= $info['icon'] ?> me-1"></i><?= $info['text'] ?>
+                                    </span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="if(confirm('Remove this interest?')) window.location.href='<?= url('api/delete-job-preference.php?id=' . $pref['id']) ?>'">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <p class="text-muted small mt-2 mb-0">
+                <i class="fas fa-lightbulb me-1"></i>
+                <strong>Tip:</strong> Higher priority categories will get more job recommendations in your feed and emails.
+            </p>
+        <?php endif; ?>
     </div>
+
 </div>
+
+<!-- MODALS -->
 
 <!-- Add Experience Modal -->
 <div class="modal fade" id="addExperienceModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="POST" action="<?= url('api/add-experience.php') ?>">
+            <form method="POST" action="<?= url('api/add-experience.php') ?>" id="experience-form">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fas fa-briefcase me-2"></i>Add Work Experience</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -773,53 +1075,83 @@ include '../includes/header.php';
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Job Title/Designation <span class="text-danger">*</span></label>
-                            <input type="text" name="designation" class="form-control" placeholder="e.g., Software Engineer" required>
+                            <label class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                            <input type="text" name="designation" class="form-control" 
+                                   placeholder="e.g., Software Engineer" required>
+                            <span class="field-hint">Your role/position at the company</span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
-                            <input type="text" name="company_name" class="form-control" placeholder="e.g., Google India" required>
+                            <input type="text" name="company_name" class="form-control" 
+                                   placeholder="e.g., TCS, Infosys, Google" required>
+                            <span class="field-hint">Name of the organization</span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Employment Type</label>
-                            <select name="employment_type" class="form-select">
+                            <label class="form-label fw-semibold">Employment Type <span class="text-danger">*</span></label>
+                            <select name="employment_type" class="form-select" required>
+                                <option value="">Select type</option>
                                 <option value="Full-time">Full-time</option>
                                 <option value="Part-time">Part-time</option>
                                 <option value="Contract">Contract</option>
                                 <option value="Internship">Internship</option>
                                 <option value="Freelance">Freelance</option>
                             </select>
+                            <span class="field-hint">Type of employment</span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Location</label>
-                            <input type="text" name="location" class="form-control" placeholder="e.g., Bangalore, Karnataka">
+                            <input type="text" name="location" class="form-control" 
+                                   placeholder="e.g., Mumbai" list="indian-cities">
+                            <span class="field-hint">City where you worked</span>
                         </div>
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
-                            <input type="date" name="start_date" class="form-control" required>
+                            <input type="date" name="start_date" class="form-control" 
+                                   id="exp_start_date" 
+                                   max="<?= date('Y-m-d') ?>"
+                                   required 
+                                   onchange="validateExperienceDates()">
+                            <span class="field-hint">When did you start?</span>
                         </div>
-                        <div class="col-md-5 mb-3">
+                        <div class="col-md-6 mb-3" id="exp-end-date-field">
                             <label class="form-label fw-semibold">End Date</label>
-                            <input type="date" name="end_date" class="form-control" id="exp_end_date">
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-semibold">&nbsp;</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="is_current" value="1" id="exp_is_current">
-                                <label class="form-check-label" for="exp_is_current">Current</label>
+                            <input type="date" name="end_date" class="form-control" 
+                                   id="exp_end_date"
+                                   max="<?= date('Y-m-d') ?>"
+                                   onchange="validateExperienceDates()">
+                            <span class="field-hint">When did you end?</span>
+                            <div id="exp-date-error" class="validation-message invalid d-none">
+                                End date must be after start date
                             </div>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label fw-semibold">Job Description</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_current" 
+                                       value="1" id="exp_current" onchange="toggleExpEndDate(this)">
+                                <label class="form-check-label" for="exp_current">
+                                    <i class="fas fa-circle-dot me-1"></i>I currently work here
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-semibold">Job Description / Responsibilities</label>
                             <textarea name="description" class="form-control" rows="4" 
-                                      placeholder="Describe your responsibilities, achievements, and key projects..."></textarea>
+                                      maxlength="1000"
+                                      placeholder="Describe your key responsibilities and achievements..."
+                                      oninput="updateCharCounter(this, 1000, 'exp-desc-counter')"></textarea>
+                            <div class="d-flex justify-content-between">
+                                <span class="field-hint">
+                                    <i class="fas fa-info-circle"></i>List your main duties and accomplishments
+                                </span>
+                                <span class="char-counter" id="exp-desc-counter">0/1000</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Save Experience
+                    <button type="submit" class="btn-primary-custom" id="save-exp-btn">
+                        <i class="fas fa-plus me-1"></i>Add Experience
                     </button>
                 </div>
             </form>
@@ -840,33 +1172,60 @@ include '../includes/header.php';
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Skill Name <span class="text-danger">*</span></label>
                         <input type="text" name="skill_name" class="form-control" 
-                               placeholder="e.g., Python, Communication, Project Management" required>
+                               placeholder="e.g., PHP, JavaScript, Project Management" 
+                               required
+                               list="common-skills">
+                        <datalist id="common-skills">
+                            <option value="PHP">
+                            <option value="JavaScript">
+                            <option value="Python">
+                            <option value="Java">
+                            <option value="React">
+                            <option value="Node.js">
+                            <option value="SQL">
+                            <option value="HTML/CSS">
+                            <option value="Communication">
+                            <option value="Leadership">
+                            <option value="Project Management">
+                            <option value="Microsoft Excel">
+                            <option value="Problem Solving">
+                        </datalist>
+                        <span class="field-hint">
+                            <i class="fas fa-info-circle"></i>Enter the skill name (typing shows suggestions)
+                        </span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Proficiency Level</label>
                         <select name="proficiency_level" class="form-select">
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate" selected>Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                            <option value="Expert">Expert</option>
+                            <option value="Beginner">Beginner - Just started learning</option>
+                            <option value="Intermediate" selected>Intermediate - Can work independently</option>
+                            <option value="Advanced">Advanced - Can mentor others</option>
+                            <option value="Expert">Expert - Industry recognized expertise</option>
                         </select>
+                        <span class="field-hint">
+                            <i class="fas fa-chart-line"></i>How would you rate your proficiency?
+                        </span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Years of Experience</label>
                         <input type="number" name="years_of_experience" class="form-control" 
-                               min="0" max="50" value="0" placeholder="0">
+                               placeholder="0" min="0" max="50" value="0">
+                        <span class="field-hint">
+                            <i class="fas fa-clock"></i>How many years have you worked with this skill?
+                        </span>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Add Skill
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="fas fa-plus me-1"></i>Add Skill
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 <!-- Add Job Preference Modal -->
 <div class="modal fade" id="addPreferenceModal" tabindex="-1">
     <div class="modal-dialog">
@@ -882,13 +1241,8 @@ include '../includes/header.php';
                         <select name="job_category_id" class="form-select" required>
                             <option value="">Select a category...</option>
                             <?php
-                            // Get all available categories
-                            $allCategories = getAllJobCategories($pdo, true);
-                            // Get user's existing preferences
-                            $existingPrefs = array_column($userPreferences ?? [], 'job_category_id');
-                            
-                            foreach ($allCategories as $category):
-                                // Skip if already added
+                            $existingPrefs = array_column($preferences ?? [], 'job_category_id');
+                            foreach ($jobCategories as $category):
                                 if (in_array($category['id'], $existingPrefs)) continue;
                             ?>
                                 <option value="<?= $category['id'] ?>">
@@ -896,22 +1250,41 @@ include '../includes/header.php';
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <span class="field-hint">
+                            <i class="fas fa-info-circle"></i>Which job category interests you?
+                        </span>
                     </div>
-                    
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Priority Level</label>
-                        <select name="priority" class="form-select">
-                            <option value="3">High Priority - Very interested</option>
-                            <option value="2" selected>Medium Priority - Interested</option>
-                            <option value="1">Low Priority - Somewhat interested</option>
-                        </select>
-                        <small class="text-muted">Higher priority categories will be shown first in recommendations</small>
+                        <div class="priority-selector">
+                            <div class="priority-option" onclick="selectPriority(this, 3)">
+                                <input type="radio" name="priority" value="3" class="d-none">
+                                <i class="fas fa-fire fa-2x text-danger mb-2"></i>
+                                <div class="fw-bold">High</div>
+                                <small class="text-muted">Very interested</small>
+                            </div>
+                            <div class="priority-option selected" onclick="selectPriority(this, 2)">
+                                <input type="radio" name="priority" value="2" class="d-none" checked>
+                                <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                                <div class="fw-bold">Medium</div>
+                                <small class="text-muted">Interested</small>
+                            </div>
+                            <div class="priority-option" onclick="selectPriority(this, 1)">
+                                <input type="radio" name="priority" value="1" class="d-none">
+                                <i class="fas fa-star-half-alt fa-2x text-info mb-2"></i>
+                                <div class="fw-bold">Low</div>
+                                <small class="text-muted">Somewhat interested</small>
+                            </div>
+                        </div>
+                        <span class="field-hint">
+                            <i class="fas fa-info-circle"></i>Higher priority = More job recommendations
+                        </span>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-heart me-2"></i>Add Interest
+                    <button type="submit" class="btn-primary-custom">
+                        <i class="fas fa-heart me-1"></i>Add Interest
                     </button>
                 </div>
             </form>
@@ -920,93 +1293,305 @@ include '../includes/header.php';
 </div>
 
 <script>
-// Delete preference function
-function deletePreference(id) {
-    if (confirm('Remove this job category from your interests?')) {
-        window.location.href = `<?= url('api/delete-job-preference.php') ?>?id=${id}`;
+// Character counter
+function updateCharCounter(textarea, maxChars, counterId) {
+    const counter = document.getElementById(counterId);
+    const length = textarea.value.length;
+    counter.textContent = length + '/' + maxChars;
+    
+    counter.classList.remove('warning', 'danger');
+    if (length > maxChars * 0.9) {
+        counter.classList.add('danger');
+    } else if (length > maxChars * 0.7) {
+        counter.classList.add('warning');
     }
 }
-</script>
 
-<!-- JavaScript -->
-<script>
-// Profile photo preview
-document.getElementById('profile_photo').addEventListener('change', function(e) {
-    if (e.target.files && e.target.files[0]) {
+// Validate name
+function validateName(input) {
+    const value = input.value.trim();
+    const validation = document.getElementById('name-validation');
+    
+    if (value.length < 3) {
+        validation.textContent = 'Name must be at least 3 characters';
+        validation.className = 'validation-message invalid';
+        input.classList.remove('input-valid');
+        input.classList.add('input-invalid');
+    } else if (!/^[a-zA-Z\s.]+$/.test(value)) {
+        validation.textContent = 'Name can only contain letters and spaces';
+        validation.className = 'validation-message invalid';
+        input.classList.remove('input-valid');
+        input.classList.add('input-invalid');
+    } else {
+        validation.textContent = 'Looks good!';
+        validation.className = 'validation-message valid';
+        input.classList.remove('input-invalid');
+        input.classList.add('input-valid');
+    }
+}
+
+// Validate phone
+function validatePhone(input) {
+    const value = input.value;
+    const validation = document.getElementById('phone-validation');
+    
+    if (value.length === 0) {
+        validation.textContent = '';
+        input.classList.remove('input-valid', 'input-invalid');
+    } else if (!/^[6-9]/.test(value)) {
+        validation.textContent = 'Indian mobile numbers start with 6, 7, 8, or 9';
+        validation.className = 'validation-message invalid';
+        input.classList.add('input-invalid');
+        input.classList.remove('input-valid');
+    } else if (value.length < 10) {
+        validation.textContent = 'Enter 10 digits';
+        validation.className = 'validation-message invalid';
+        input.classList.add('input-invalid');
+        input.classList.remove('input-valid');
+    } else if (value.length === 10) {
+        validation.textContent = 'Valid phone number!';
+        validation.className = 'validation-message valid';
+        input.classList.add('input-valid');
+        input.classList.remove('input-invalid');
+    } else {
+        validation.textContent = 'Too many digits';
+        validation.className = 'validation-message invalid';
+        input.classList.add('input-invalid');
+        input.classList.remove('input-valid');
+    }
+}
+
+// Validate location
+function validateLocation(input) {
+    if (input.value.trim().length > 0) {
+        input.classList.add('input-valid');
+    } else {
+        input.classList.remove('input-valid');
+    }
+}
+
+// Validate URL
+function validateURL(input, domain) {
+    if (input.value.trim().length === 0) {
+        input.classList.remove('input-valid', 'input-invalid');
+        return;
+    }
+    
+    try {
+        new URL(input.value);
+        if (domain && !input.value.includes(domain)) {
+            input.classList.add('input-invalid');
+            input.classList.remove('input-valid');
+        } else {
+            input.classList.add('input-valid');
+            input.classList.remove('input-invalid');
+        }
+    } catch (e) {
+        input.classList.add('input-invalid');
+        input.classList.remove('input-valid');
+    }
+}
+
+// Validate salary range
+function validateSalary() {
+    const minInput = document.querySelector('input[name="expected_salary_min"]');
+    const maxInput = document.querySelector('input[name="expected_salary_max"]');
+    const validation = document.getElementById('salary-validation');
+    
+    const min = parseInt(minInput.value) || 0;
+    const max = parseInt(maxInput.value) || 0;
+    
+    if (min > 0 && max > 0 && max < min) {
+        validation.textContent = 'Maximum salary must be greater than minimum';
+        validation.className = 'validation-message invalid';
+    } else if (min > 0 || max > 0) {
+        validation.textContent = 'Salary range looks good!';
+        validation.className = 'validation-message valid';
+    } else {
+        validation.textContent = '';
+    }
+}
+
+// Preview and validate photo
+function previewAndValidatePhoto(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate size
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Image must be less than 2MB');
+            input.value = '';
+            return;
+        }
+        
+        // Validate type
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+            alert('Only JPG and PNG images are allowed');
+            input.value = '';
+            return;
+        }
+        
+        // Preview
         const reader = new FileReader();
-        reader.onload = function(event) {
-            const preview = document.getElementById('profilePhotoPreview');
-            preview.outerHTML = `<img src="${event.target.result}" id="profilePhotoPreview" class="rounded-circle border" width="120" height="120" style="object-fit: cover;" alt="Profile Photo">`;
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-});
-
-// Resume file name display
-document.getElementById('resumeInput').addEventListener('change', function(e) {
-    const fileName = e.target.files[0]?.name;
-    if (fileName) {
-        document.getElementById('fileName').textContent = `Selected: ${fileName}`;
-        document.getElementById('uploadBtn').style.display = 'inline-block';
-    }
-});
-
-// Education: Disable end year if currently studying
-document.getElementById('edu_is_current').addEventListener('change', function() {
-    document.getElementById('edu_end_year').disabled = this.checked;
-    if (this.checked) document.getElementById('edu_end_year').value = '';
-});
-
-// Experience: Disable end date if currently working
-document.getElementById('exp_is_current').addEventListener('change', function() {
-    document.getElementById('exp_end_date').disabled = this.checked;
-    if (this.checked) document.getElementById('exp_end_date').value = '';
-});
-
-// Delete functions
-function deleteEducation(id) {
-    if (confirm('Are you sure you want to delete this education record?')) {
-        window.location.href = `<?= url('api/delete-education.php') ?>?id=${id}`;
+        reader.onload = function(e) {
+            const container = document.getElementById('preview-container');
+            const img = document.getElementById('preview-img');
+            if (img) {
+                img.src = e.target.result;
+            } else if (container) {
+                container.outerHTML = '<img src="' + e.target.result + '" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover; border: 3px solid #e5e7eb;" id="preview-img">';
+            }
+        }
+        reader.readAsDataURL(file);
     }
 }
 
-function deleteExperience(id) {
-    if (confirm('Are you sure you want to delete this work experience?')) {
-        window.location.href = `<?= url('api/delete-experience.php') ?>?id=${id}`;
+// Show resume upload form
+function showResumeUpload() {
+    document.getElementById('resume-form').style.display = 'block';
+}
+
+// Handle resume upload
+function handleResumeUpload(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const uploadBox = document.getElementById('upload-box');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        
+        // Validate
+        if (file.type !== 'application/pdf') {
+            alert('Only PDF files are allowed');
+            input.value = '';
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File must be less than 5MB');
+            input.value = '';
+            return;
+        }
+        
+        // Show file info
+        fileName.textContent = file.name;
+        fileSize.textContent = '(' + (file.size / 1024).toFixed(1) + ' KB)';
+        fileInfo.classList.remove('d-none');
+        uploadBox.classList.add('uploading');
+        
+        // Auto-submit
+        setTimeout(() => {
+            document.getElementById('upload-icon').className = 'fas fa-spinner fa-spin fa-3x text-primary mb-3';
+            document.getElementById('upload-text').textContent = 'Uploading...';
+            document.getElementById('upload-hint').textContent = 'Please wait';
+            input.form.submit();
+        }, 500);
     }
 }
 
-function deleteSkill(id) {
-    if (confirm('Are you sure you want to delete this skill?')) {
-        window.location.href = `<?= url('api/delete-skill.php') ?>?id=${id}`;
+// Education: Handle degree change
+function handleDegreeChange(select) {
+    const customField = document.getElementById('custom-degree-field');
+    if (select.value === 'Other') {
+        customField.style.display = 'block';
+    } else {
+        customField.style.display = 'none';
     }
 }
+
+// Education: Toggle end year
+function toggleEndYear(checkbox) {
+    const endYearField = document.getElementById('end-year-field');
+    
+    if (checkbox.checked) {
+        endYearField.style.display = 'none';
+    } else {
+        endYearField.style.display = 'block';
+    }
+}
+
+// Education: Validate years
+function validateEducationYears() {
+    const startYear = parseInt(document.getElementById('start_year').value);
+    const endYear = parseInt(document.getElementById('end_year').value);
+    const errorMsg = document.getElementById('year-error');
+    const saveBtn = document.getElementById('save-education-btn');
+    const isCurrent = document.getElementById('is_current').checked;
+    
+    if (!isCurrent && startYear && endYear && endYear < startYear) {
+        errorMsg.classList.remove('d-none');
+        saveBtn.disabled = true;
+    } else {
+        errorMsg.classList.add('d-none');
+        saveBtn.disabled = false;
+    }
+}
+
+// Experience: Toggle end date
+function toggleExpEndDate(checkbox) {
+    const endDateField = document.getElementById('exp-end-date-field');
+    
+    if (checkbox.checked) {
+        endDateField.style.display = 'none';
+    } else {
+        endDateField.style.display = 'block';
+    }
+}
+
+// Experience: Validate dates
+function validateExperienceDates() {
+    const startDate = document.getElementById('exp_start_date').value;
+    const endDate = document.getElementById('exp_end_date').value;
+    const errorMsg = document.getElementById('exp-date-error');
+    const saveBtn = document.getElementById('save-exp-btn');
+    const isCurrent = document.getElementById('exp_current').checked;
+    
+    if (!isCurrent && startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        errorMsg.classList.remove('d-none');
+        saveBtn.disabled = true;
+    } else {
+        errorMsg.classList.add('d-none');
+        saveBtn.disabled = false;
+    }
+}
+
+// Priority selector
+function selectPriority(element, value) {
+    document.querySelectorAll('.priority-option').forEach(el => {
+        el.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    element.querySelector('input[type="radio"]').checked = true;
+}
+
+// Scroll to section if hash present
+if (window.location.hash) {
+    setTimeout(() => {
+        const el = document.querySelector(window.location.hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Check education degree
+    const degreeSelect = document.querySelector('select[name="degree"]');
+    if (degreeSelect && (degreeSelect.value === 'Other' || !['Ph.D', "Master's Degree", "Bachelor's Degree", 'Diploma', '12th Grade', '10th Grade', ''].includes(degreeSelect.value))) {
+        document.getElementById('custom-degree-field').style.display = 'block';
+    }
+    
+    // Check if currently studying
+    const eduCurrentCheckbox = document.getElementById('is_current');
+    if (eduCurrentCheckbox && eduCurrentCheckbox.checked) {
+        toggleEndYear(eduCurrentCheckbox);
+    }
+    
+    // Check if currently working
+    const expCurrentCheckbox = document.getElementById('exp_current');
+    if (expCurrentCheckbox && expCurrentCheckbox.checked) {
+        toggleExpEndDate(expCurrentCheckbox);
+    }
+});
 </script>
-
-<style>
-.nav-tabs .nav-link {
-    color: #6c757d;
-    border: none;
-    border-bottom: 2px solid transparent;
-}
-.nav-tabs .nav-link:hover {
-    border-bottom-color: #dee2e6;
-}
-.nav-tabs .nav-link.active {
-    color: #6366f1;
-    border-bottom-color: #6366f1;
-    font-weight: 600;
-}
-.border-dashed {
-    border-style: dashed !important;
-}
-.input-group-text {
-    background-color: #f8f9fa;
-    border-right: none;
-}
-.input-group .form-control {
-    border-left: none;
-}
-</style>
 
 <?php include '../includes/footer.php'; ?>

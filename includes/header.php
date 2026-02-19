@@ -254,7 +254,7 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                            aria-label="Contact Us">
                             📧 Contact
                         </a>
-                    </li> -->
+                    </li> --v
                     
                     <!-- Candidate Authentication Menu -->
                     <?php if (function_exists('isCandidateLoggedIn') && isCandidateLoggedIn()): ?>
@@ -276,11 +276,11 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                                         <i class="fas fa-user-edit me-2 text-info"></i>Edit Profile
                                     </a>
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <a class="dropdown-item" href="<?php echo url('profile/saved-jobs.php'); ?>">
                                         <i class="fas fa-bookmark me-2 text-warning"></i>Saved Jobs
                                     </a>
-                                </li>
+                                </li> -->
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="<?php echo url('auth/logout.php'); ?>">

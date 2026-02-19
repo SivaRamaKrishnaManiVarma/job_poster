@@ -1,12 +1,22 @@
 <?php
-require_once '../includes/session-check.php';
+require_once '../includes/config.php';
+
+// Start session
+if (php_sapi_name() !== 'cli') {
+    session_start();
+}
+
+if (!isset($_SESSION['candidate_id'])) {
+    header('Location: ' . url('auth/login.php'));
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . url('profile/edit-profile.php'));
     exit;
 }
 
-$userId = $candidateId;
+$userId = $_SESSION['candidate_id'];
 $errors = [];
 
 // Sanitize inputs
@@ -34,8 +44,19 @@ if (!empty($phone) && !preg_match('/^[0-9]{10}$/', $phone)) {
     $errors[] = 'Phone must be 10 digits';
 }
 
+// Get current user data
+try {
+    $stmt = $pdo->prepare("SELECT profile_photo FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $currentUser = $stmt->fetch();
+} catch(PDOException $e) {
+    error_log("Database error: " . $e->getMessage());
+    header('Location: ' . url('profile/edit-profile.php?error=Database error#basic'));
+    exit;
+}
+
 // Handle profile photo upload
-$profile_photo = $currentUser['profile_photo'];
+$profile_photo = $currentUser['profile_photo'] ?? '';
 if (!empty($_FILES['profile_photo']['name'])) {
     $file = $_FILES['profile_photo'];
     $allowed = ['image/jpeg', 'image/png', 'image/jpg'];
@@ -50,16 +71,17 @@ if (!empty($_FILES['profile_photo']['name'])) {
             // Generate unique filename
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = 'profile_' . $userId . '_' . time() . '.' . $extension;
-            $uploadPath = '../uploads/profile_photos/' . $filename;
+            $uploadDir = __DIR__ . '/../uploads/profile_photos/';
+            $uploadPath = $uploadDir . $filename;
             
             // Create directory if not exists
-            if (!is_dir('../uploads/profile_photos')) {
-                mkdir('../uploads/profile_photos', 0755, true);
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
             }
             
             // Delete old photo if exists
-            if (!empty($currentUser['profile_photo']) && file_exists('../uploads/profile_photos/' . $currentUser['profile_photo'])) {
-                unlink('../uploads/profile_photos/' . $currentUser['profile_photo']);
+            if (!empty($currentUser['profile_photo']) && file_exists($uploadDir . $currentUser['profile_photo'])) {
+                unlink($uploadDir . $currentUser['profile_photo']);
             }
             
             // Upload new photo
@@ -73,7 +95,7 @@ if (!empty($_FILES['profile_photo']['name'])) {
 }
 
 if (!empty($errors)) {
-    header('Location: ' . url('profile/edit-profile.php?error=' . urlencode(implode(', ', $errors))));
+    header('Location: ' . url('profile/edit-profile.php?error=' . urlencode(implode(', ', $errors)) . '#basic'));
     exit;
 }
 
@@ -120,12 +142,12 @@ try {
     // Update session name if changed
     $_SESSION['candidate_name'] = $full_name;
     
-    header('Location: ' . url('profile/edit-profile.php?success=profile_updated'));
+    header('Location: ' . url('profile/edit-profile.php?success=profile_updated#basic'));
     exit;
     
 } catch(PDOException $e) {
     error_log("Profile update error: " . $e->getMessage());
-    header('Location: ' . url('profile/edit-profile.php?error=Update failed. Please try again.'));
+    header('Location: ' . url('profile/edit-profile.php?error=Update failed. Please try again#basic'));
     exit;
 }
 ?>
