@@ -54,6 +54,13 @@
                         👥 Manage Admins
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'manage-employers.php' ? 'active' : ''; ?>"
+                    href="manage-employers.php">
+                        🏢 Manage Employers
+                    </a>
+                </li>
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                         👤 <?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Admin'); ?>

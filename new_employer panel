@@ -1,0 +1,744 @@
+<?php
+// Start session only if not in CLI mode
+if (php_sapi_name() !== 'cli') {
+    session_start();
+}
+
+
+// ============================================
+// ENVIRONMENT DETECTION
+// ============================================
+// Check if running from command line (cron) or web
+if (php_sapi_name() === 'cli') {
+    // Running from command line - assume localhost for development
+    $isLocalhost = true;
+} else {
+    // Running from web - check HTTP_HOST
+    $isLocalhost = (isset($_SERVER['HTTP_HOST']) && 
+                    ($_SERVER['HTTP_HOST'] == "localhost" || 
+                     $_SERVER['HTTP_HOST'] == "127.0.0.1"));
+}
+
+
+// ============================================
+// DATABASE CONFIGURATION
+// ============================================
+if ($isLocalhost) {
+    // LOCALHOST Database
+    define('DB_HOST', 'localhost');
+    define('DB_NAME', 'job_portal');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('ENVIRONMENT', 'local');
+} else {
+    // PRODUCTION Database
+    define('DB_HOST', 'localhost');
+    define('DB_NAME', 'u409529889_job_poster');
+    define('DB_USER', 'u409529889_job_poster');
+    define('DB_PASS', '!teKKdx9G');
+    define('ENVIRONMENT', 'production');
+}
+
+
+// ============================================
+// BASE PATH CONFIGURATION (For URLs)
+// ============================================
+if ($isLocalhost) {
+    // LOCALHOST - with subdirectory /job_poster
+    define('BASE_PATH', '/job_poster');
+} else {
+    // PRODUCTION - at root level
+    define('BASE_PATH', '');
+}
+
+
+// ============================================
+// BASE URL CONFIGURATION
+// ============================================
+// Generate full base URL
+if (php_sapi_name() === 'cli') {
+    // Command line - use hardcoded URL
+    if ($isLocalhost) {
+        define('BASE_URL', 'http://localhost' . BASE_PATH);
+    } else {
+        define('BASE_URL', 'https://findwork.mindrevel.in/' . BASE_PATH); // Update for production
+    }
+} else {
+    // Web request - detect from HTTP_HOST
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    define('BASE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . BASE_PATH);
+}
+
+
+// ============================================
+// URL HELPER FUNCTION
+// ============================================
+/**
+ * Generate URL with correct base path
+ * @param string $path - Path to append (e.g., 'jobs/my-job' or '?category=5')
+ * @return string - Complete path with base
+ */
+function url($path = '') {
+    $path = ltrim($path, '/');
+    return BASE_PATH . ($path ? '/' . $path : '');
+}
+
+
+/**
+ * Generate absolute URL (with domain)
+ * @param string $path - Path to append
+ * @return string - Complete URL with domain
+ */
+function fullUrl($path = '') {
+    $path = ltrim($path, '/');
+    return BASE_URL . ($path ? '/' . $path : '');
+}
+
+
+// ============================================
+// DATABASE CONNECTION
+// ============================================
+try {
+    $pdo = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+        DB_USER, 
+        DB_PASS,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]
+    );
+} catch(PDOException $e) {
+    // Log error
+    error_log("Database connection failed: " . $e->getMessage());
+    
+    // Show appropriate message based on context
+    if (php_sapi_name() === 'cli') {
+        die("Database connection failed. Check error logs.\n");
+    } else {
+        die("Database connection error. Please contact administrator.");
+    }
+}
+
+
+// ============================================
+// TIMEZONE
+// ============================================
+date_default_timezone_set('Asia/Kolkata');
+
+
+// ============================================
+// DEBUG MODE (Comment out in production)
+// ============================================
+// Uncomment below to see environment info (web only)
+/*
+if (php_sapi_name() !== 'cli') {
+    echo "<!-- Environment: " . ENVIRONMENT . " -->\n";
+    echo "<!-- Base Path: " . BASE_PATH . " -->\n";
+    echo "<!-- Base URL: " . BASE_URL . " -->\n";
+}
+*/
+?>
+
+includes/config
+
+<?php
+function sanitize($data) {
+    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
+}
+
+
+function isAdmin() {
+    return isset($_SESSION['admin_id']) && isset($_SESSION['is_admin']);
+}
+
+
+function redirect($url) {
+    header("Location: $url");
+    exit();
+}
+
+
+/**
+ * Get jobs with filters and master data JOINs
+ * @param PDO $pdo - Database connection
+ * @param array $filters - Array of filter parameters
+ * @return array - Array of job records
+ */
+function getJobs($pdo, $filters = []) {
+    $sql = "SELECT 
+        j.id,
+        j.title,
+        j.company,
+        j.description,
+        j.job_link,
+        j.official_website,
+        j.location,
+        j.posted_date,
+        j.application_deadline,
+        j.is_active,
+        c.category_name,
+        c.icon as category_icon,
+        w.mode_name as work_mode,
+        w.icon as work_mode_icon,
+        e.type_name as employment_type,
+        e.icon as employment_type_icon,
+        ex.level_name as experience_level,
+        ex.icon as experience_level_icon,
+        s.state_name
+    FROM jobs j
+    LEFT JOIN master_job_categories c ON j.job_category_id = c.id
+    LEFT JOIN master_work_modes w ON j.work_mode_id = w.id
+    LEFT JOIN master_employment_types e ON j.employment_type_id = e.id
+    LEFT JOIN master_experience_levels ex ON j.experience_level_id = ex.id
+    LEFT JOIN master_states s ON j.state_id = s.id
+    WHERE j.is_active = 1";
+    
+    $params = [];
+    
+    // Filter expired jobs by default (unless explicitly requested)
+    $showExpired = isset($filters['show_expired']) ? $filters['show_expired'] : false;
+    if (!$showExpired) {
+        $sql .= " AND (j.application_deadline IS NULL OR j.application_deadline >= CURDATE())";
+    }
+    
+    // Search filter
+    if (!empty($filters['search'])) {
+        $sql .= " AND (j.title LIKE ? OR j.company LIKE ? OR j.description LIKE ?)";
+        $searchTerm = '%' . $filters['search'] . '%';
+        $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm]);
+    }
+    
+    // Category filter (by ID)
+    if (!empty($filters['category'])) {
+        $sql .= " AND j.job_category_id = ?";
+        $params[] = $filters['category'];
+    }
+    
+    // Location filter
+    if (!empty($filters['location'])) {
+        $sql .= " AND j.location LIKE ?";
+        $params[] = '%' . $filters['location'] . '%';
+    }
+    
+    // Work mode filter
+    if (!empty($filters['work_mode'])) {
+        $sql .= " AND j.work_mode_id = ?";
+        $params[] = $filters['work_mode'];
+    }
+    
+    // Employment type filter
+    if (!empty($filters['employment_type'])) {
+        $sql .= " AND j.employment_type_id = ?";
+        $params[] = $filters['employment_type'];
+    }
+    
+    // Experience level filter
+    if (!empty($filters['experience_level'])) {
+        $sql .= " AND j.experience_level_id = ?";
+        $params[] = $filters['experience_level'];
+    }
+    
+    $sql .= " ORDER BY j.posted_date DESC LIMIT 200";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+
+/**
+ * Get deadline status and urgency level
+ * @param string $deadline - Deadline date (Y-m-d format)
+ * @return array - ['status' => string, 'days_left' => int, 'class' => string]
+ */
+function getDeadlineStatus($deadline) {
+    if (empty($deadline)) {
+        return [
+            'status' => 'no_deadline',
+            'days_left' => null,
+            'class' => 'deadline-none',
+            'label' => 'No Deadline'
+        ];
+    }
+    
+    $deadlineDate = strtotime($deadline);
+    $today = strtotime(date('Y-m-d'));
+    $daysLeft = floor(($deadlineDate - $today) / (60 * 60 * 24));
+    
+    if ($daysLeft < 0) {
+        return [
+            'status' => 'expired',
+            'days_left' => $daysLeft,
+            'class' => 'deadline-expired',
+            'label' => 'Expired'
+        ];
+    } elseif ($daysLeft == 0) {
+        return [
+            'status' => 'today',
+            'days_left' => 0,
+            'class' => 'deadline-urgent',
+            'label' => 'Last Day!'
+        ];
+    } elseif ($daysLeft <= 3) {
+        return [
+            'status' => 'urgent',
+            'days_left' => $daysLeft,
+            'class' => 'deadline-urgent',
+            'label' => "$daysLeft day" . ($daysLeft > 1 ? 's' : '') . ' left'
+        ];
+    } elseif ($daysLeft <= 7) {
+        return [
+            'status' => 'warning',
+            'days_left' => $daysLeft,
+            'class' => 'deadline-warning',
+            'label' => "$daysLeft days left"
+        ];
+    } else {
+        return [
+            'status' => 'normal',
+            'days_left' => $daysLeft,
+            'class' => 'deadline-normal',
+            'label' => date('d M Y', $deadlineDate)
+        ];
+    }
+}
+
+
+/**
+ * Get count of jobs expiring soon (for admin dashboard)
+ * @param PDO $pdo
+ * @param int $days - Number of days threshold
+ * @return int
+ */
+function getJobsExpiringSoon($pdo, $days = 7) {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) FROM jobs 
+        WHERE is_active = 1 
+        AND application_deadline IS NOT NULL
+        AND application_deadline >= CURDATE() 
+        AND application_deadline <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
+    ");
+    $stmt->execute([$days]);
+    return $stmt->fetchColumn();
+}
+
+
+/**
+ * Get count of expired jobs (for admin alerts)
+ * @param PDO $pdo
+ * @return int
+ */
+function getExpiredActiveJobs($pdo) {
+    $stmt = $pdo->query("
+        SELECT COUNT(*) FROM jobs 
+        WHERE is_active = 1 
+        AND application_deadline IS NOT NULL
+        AND application_deadline < CURDATE()
+    ");
+    return $stmt->fetchColumn();
+}
+
+
+/**
+ * Get archived (expired) jobs
+ * @param PDO $pdo
+ * @param array $filters
+ * @return array
+ */
+function getArchivedJobs($pdo, $filters = []) {
+    $filters['show_expired'] = true;
+    return getJobs($pdo, $filters);
+}
+
+
+/**
+ * Generate URL-friendly slug from text
+ */
+function generateSlug($text) {
+    // Convert to lowercase
+    $text = strtolower($text);
+    
+    // Remove special characters
+    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
+    
+    // Replace spaces with hyphens
+    $text = preg_replace('/[\s-]+/', '-', $text);
+    
+    // Remove leading/trailing hyphens
+    $text = trim($text, '-');
+    
+    return $text;
+}
+
+
+/**
+ * Generate unique slug for job
+ */
+function generateUniqueJobSlug($pdo, $title, $company, $existingSlug = null, $jobId = null) {
+    // Create base slug from title and company
+    $baseSlug = generateSlug($title . ' at ' . $company);
+    
+    // Limit length
+    if (strlen($baseSlug) > 200) {
+        $baseSlug = substr($baseSlug, 0, 200);
+    }
+    
+    $slug = $baseSlug;
+    $counter = 1;
+    
+    // Check if slug exists
+    while (true) {
+        $checkSql = "SELECT id FROM jobs WHERE slug = ?";
+        $params = [$slug];
+        
+        // Exclude current job ID when editing
+        if ($jobId) {
+            $checkSql .= " AND id != ?";
+            $params[] = $jobId;
+        }
+        
+        $stmt = $pdo->prepare($checkSql);
+        $stmt->execute($params);
+        
+        if (!$stmt->fetch()) {
+            // Slug is unique
+            break;
+        }
+        
+        // Add counter to make unique
+        $slug = $baseSlug . '-' . $counter;
+        $counter++;
+    }
+    
+    return $slug;
+}
+
+
+?>includes/functions
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $pageTitle ?? 'Admin Panel - Job Portal'; ?></title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Admin CSS -->
+    <link href="../assets/css/admin.css" rel="stylesheet">
+</head>
+<body class="admin-page">
+
+
+<!-- Admin Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+    <div class="container-fluid" style="max-width: 1600px; margin: 0 auto; padding: 0 2rem;">
+        <a class="navbar-brand" href="index.php" style="font-weight: 700; font-size: 1.25rem;">
+            💼 Job Portal Admin
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>" href="index.php">
+                        📊 Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'jobs.php' ? 'active' : ''; ?>" href="jobs.php">
+                        💼 Manage Jobs
+                    </a>
+                </li>
+                  <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'help.php' ? 'active' : ''; ?>" href="help.php">
+                        📚 Help
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>" href="settings.php">
+                        ⚙️ Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'manage-admins.php' ? 'active' : ''; ?>" href="manage-admins.php">
+                        👥 Manage Admins
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        👤 <?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Admin'); ?>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="../index.php" target="_blank">🌐 View Site</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="logout.php">🚪 Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<main class="admin-container">
+
+
+describe jobs;
+[ Edit inline ] [ Edit ] [ Create PHP code ]
+FieldTypeNullKeyDefaultExtra
+id
+int(11)
+NO
+PRI
+NULL
+auto_increment
+notification_number
+varchar(100)
+YES
+NULL
+title
+varchar(200)
+NO
+NULL
+slug
+varchar(255)
+YES
+UNI
+NULL
+total_vacancies
+int(11)
+YES
+NULL
+company
+varchar(100)
+NO
+NULL
+recruitment_board
+varchar(200)
+YES
+NULL
+description
+text
+YES
+NULL
+job_link
+varchar(500)
+NO
+NULL
+official_website
+varchar(255)
+YES
+NULL
+work_mode
+enum('Work from Home','On-site','Hybrid')
+YES
+MUL
+On-site
+employment_type
+enum('Full-time','Part-time','Internship')
+YES
+Full-time
+experience_level
+enum('Freshers','0-2 years','2-5 years','5+ years')
+YES
+Freshers
+location
+varchar(100)
+YES
+NULL
+category
+varchar(50)
+YES
+MUL
+NULL
+posted_date
+date
+NO
+MUL
+NULL
+application_deadline
+date
+YES
+MUL
+NULL
+is_active
+tinyint(4)
+YES
+MUL
+1
+created_at
+timestamp
+NO
+current_timestamp()
+vacancy_breakdown
+text
+YES
+NULL
+min_qualification_id
+int(11)
+YES
+NULL
+required_percentage
+varchar(50)
+YES
+NULL
+age_limit_min
+int(11)
+YES
+NULL
+age_limit_max
+int(11)
+YES
+NULL
+age_relaxation
+text
+YES
+NULL
+required_experience
+varchar(100)
+YES
+NULL
+salary_min
+decimal(10,2)
+YES
+NULL
+salary_max
+decimal(10,2)
+YES
+NULL
+pay_scale
+varchar(100)
+YES
+NULL
+allowances_details
+text
+YES
+NULL
+selection_process
+text
+YES
+NULL
+exam_pattern
+text
+YES
+NULL
+notification_date
+date
+YES
+NULL
+last_date_to_apply
+date
+YES
+NULL
+exam_date
+date
+YES
+NULL
+result_date
+date
+YES
+NULL
+eligibility_cutoff_date
+date
+YES
+NULL
+application_fee_general
+decimal(10,2)
+YES
+NULL
+application_fee_obc
+decimal(10,2)
+YES
+NULL
+application_fee_sc_st
+decimal(10,2)
+YES
+NULL
+payment_mode
+varchar(100)
+YES
+Online
+notification_pdf
+varchar(255)
+YES
+NULL
+syllabus_pdf
+varchar(255)
+YES
+NULL
+admit_card_link
+varchar(255)
+YES
+NULL
+answer_key_link
+varchar(255)
+YES
+NULL
+job_category_id
+int(11)
+YES
+MUL
+NULL
+work_mode_id
+int(11)
+YES
+MUL
+NULL
+employment_type_id
+int(11)
+YES
+MUL
+NULL
+experience_level_id
+int(11)
+YES
+MUL
+NULL
+state_id
+int(11)
+YES
+MUL
+NULL
+department_id
+int(11)
+YES
+NULL
+important_instructions
+text
+YES
+NULL
+how_to_apply_steps
+text
+YES
+NULL
+short_info
+text
+YES
+NULL
+view_count
+int(11)
+YES
+MUL
+0
+apply_click_count
+int(11)
+YES
+0
+updated_at
+timestamp
+NO
+current_timestamp()
+on update current_timestamp()
+
+

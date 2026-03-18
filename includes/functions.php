@@ -260,5 +260,20 @@ function generateUniqueJobSlug($pdo, $title, $company, $existingSlug = null, $jo
     
     return $slug;
 }
+// ============================================
+// EMPLOYER AUTH FUNCTIONS
+// ============================================
+
+function isEmployer() {
+    return isset($_SESSION['employer_id']) && isset($_SESSION['is_employer']);
+}
+
+function isEmployerOrAdmin() {
+    return isAdmin() || isEmployer();
+}
+
+function getCurrentEmployerId() {
+    return $_SESSION['employer_id'] ?? null;
+}
 
 ?>
