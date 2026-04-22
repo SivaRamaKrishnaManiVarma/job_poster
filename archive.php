@@ -3,7 +3,7 @@ require_once 'includes/config.php';
 require_once 'includes/functions.php';
 require_once 'includes/master-data-functions.php';
 
-$pageTitle = 'Job Archive - Past Opportunities';
+$pageTitle = 'Expired Jobs - Past Opportunities';
 
 // Get master data
 $categories = getAllJobCategories($pdo, true);
@@ -11,8 +11,8 @@ $workModes = getAllWorkModes($pdo, true);
 $employmentTypes = getAllEmploymentTypes($pdo, true);
 $experienceLevels = getAllExperienceLevels($pdo, true);
 
-// Get count of archived jobs
-$totalArchived = $pdo->query("
+// Get count of expired jobs (capped at 100 for display)
+$totalExpiredCount = $pdo->query("
     SELECT COUNT(*) FROM jobs 
     WHERE is_active = 1 
     AND application_deadline IS NOT NULL 
@@ -23,7 +23,7 @@ include 'includes/header.php';
 ?>
 
 <style>
-/* Archive Page Specific Styles */
+/* Expired Page Specific Styles */
 .archive-hero {
     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
     padding: 4rem 0;
@@ -194,6 +194,22 @@ include 'includes/header.php';
     font-weight: 600;
 }
 
+/* Pagination styles */
+#loadMoreContainer {
+    padding: 2rem 0;
+    margin-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+#loadMoreBtn {
+    transition: all 0.3s ease;
+}
+
+#loadMoreBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 /* Responsive */
 @media (max-width: 767px) {
     .archive-title {
@@ -221,20 +237,20 @@ include 'includes/header.php';
         ← Back to Active Jobs
     </a>
 
-    <!-- Archive Hero -->
+    <!-- Expired Hero -->
     <div class="archive-hero">
         <div class="container">
             <div class="archive-hero-content">
-                <h1 class="archive-title">📚 Job Archive</h1>
-                <p class="archive-subtitle">Browse past job opportunities for reference</p>
+                <h1 class="archive-title"><i class="fas fa-history me-2"></i> Expired Jobs</h1>
+                <p class="archive-subtitle">Displaying 100 most recently ended job opportunities</p>
                 <div class="archive-badge">
-                    <?php echo $totalArchived; ?> Archived Jobs
+                    <?php echo $totalExpiredCount > 100 ? 'Top 100' : $totalExpiredCount; ?> Expired Jobs
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Archive Notice -->
+    <!-- Expired Notice -->
     <div class="archive-notice">
         <div class="archive-notice-icon">ℹ️</div>
         <div class="archive-notice-content">
@@ -248,30 +264,38 @@ include 'includes/header.php';
         <form id="searchForm">
             <div class="row g-3 mb-3">
                 <div class="col-md-5">
-                    <input type="text" 
-                           name="search" 
-                           id="searchInput"
-                           class="form-control form-control-lg" 
-                           placeholder="🔍 Search archived jobs..." 
-                           autocomplete="off">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" 
+                               name="search" 
+                               id="searchInput"
+                               class="form-control form-control-lg border-start-0" 
+                               placeholder="Search expired jobs..." 
+                               autocomplete="off"
+                               style="padding-left: 0.5rem;">
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <select name="category" id="categorySelect" class="form-select form-select-lg">
                         <option value="">📂 All Categories</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?php echo $cat['id']; ?>">
-                                <?php echo $cat['icon']; ?> <?php echo htmlspecialchars($cat['category_name']); ?>
+                                <?php echo htmlspecialchars($cat['category_name']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input type="text" 
-                           name="location" 
-                           id="locationInput"
-                           class="form-control form-control-lg" 
-                           placeholder="📍 Location" 
-                           autocomplete="off">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-muted"></i></span>
+                        <input type="text" 
+                               name="location" 
+                               id="locationInput"
+                               class="form-control form-control-lg border-start-0" 
+                               placeholder="Location" 
+                               autocomplete="off"
+                               style="padding-left: 0.5rem;">
+                    </div>
                 </div>
             </div>
             
@@ -282,7 +306,7 @@ include 'includes/header.php';
                         <option value="">🏠 All Work Modes</option>
                         <?php foreach ($workModes as $mode): ?>
                             <option value="<?php echo $mode['id']; ?>">
-                                <?php echo $mode['icon']; ?> <?php echo htmlspecialchars($mode['mode_name']); ?>
+                                <?php echo htmlspecialchars($mode['mode_name']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -292,7 +316,7 @@ include 'includes/header.php';
                         <option value="">💼 All Job Types</option>
                         <?php foreach ($employmentTypes as $type): ?>
                             <option value="<?php echo $type['id']; ?>">
-                                <?php echo $type['icon']; ?> <?php echo htmlspecialchars($type['type_name']); ?>
+                                <?php echo htmlspecialchars($type['type_name']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -302,14 +326,14 @@ include 'includes/header.php';
                         <option value="">🎓 All Experience Levels</option>
                         <?php foreach ($experienceLevels as $level): ?>
                             <option value="<?php echo $level['id']; ?>">
-                                <?php echo $level['icon']; ?> <?php echo htmlspecialchars($level['level_name']); ?>
+                                <?php echo htmlspecialchars($level['level_name']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <button type="button" id="clearFilters" class="btn btn-outline-secondary w-100">
-                        ✕ Clear Filters
+                        <i class="fas fa-times me-2"></i> Clear Filters
                     </button>
                 </div>
             </div>
@@ -320,13 +344,13 @@ include 'includes/header.php';
     </div>
 
     <!-- Results Header -->
-    <div class="results-header">
+    <div class="results-header d-flex justify-content-between align-items-center mb-3">
         <div class="results-count">
             <span id="resultsCount">Loading...</span>
         </div>
-        <div class="sort-dropdown">
-            <label for="sortBy">Sort by:</label>
-            <select id="sortBy" class="form-select">
+        <div class="sort-dropdown d-flex align-items-center">
+            <label for="sortBy" class="me-2 text-muted small fw-bold text-uppercase">Sort by:</label>
+            <select id="sortBy" class="form-select form-select-sm" style="width: auto;">
                 <option value="date_desc">Newest First</option>
                 <option value="date_asc">Oldest First</option>
                 <option value="deadline_asc">Recent Deadline</option>
@@ -340,21 +364,30 @@ include 'includes/header.php';
         <!-- Loading Overlay -->
         <div class="loading-overlay">
             <div class="spinner"></div>
-            <p class="loading-text">Loading archived jobs...</p>
+            <p class="loading-text">Loading expired jobs...</p>
         </div>
         
         <!-- Jobs will be loaded here via AJAX -->
         <div class="row g-4" id="jobsContainer"></div>
+
+        <!-- Load More Button -->
+        <div id="loadMoreContainer" class="text-center" style="display: none;">
+            <button id="loadMoreBtn" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-plus me-2"></i> Load More Expired Jobs
+            </button>
+            <p id="endOfResults" class="text-muted mt-3" style="display: none;">
+                <i class="fas fa-info-circle me-1"></i> You've reached the end of the 100 most recently expired jobs.
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-// Archive Page - AJAX Search & Filter
+// Expired Jobs Page - AJAX Search & Filter with Lazy Loading
 (function() {
     'use strict';
     
     // DOM Elements
-    const searchForm = document.getElementById('searchForm');
     const searchInput = document.getElementById('searchInput');
     const categorySelect = document.getElementById('categorySelect');
     const locationInput = document.getElementById('locationInput');
@@ -367,15 +400,26 @@ include 'includes/header.php';
     const loadingOverlay = document.querySelector('.loading-overlay');
     const resultsCount = document.getElementById('resultsCount');
     const activeFiltersDiv = document.getElementById('activeFilters');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const endOfResults = document.getElementById('endOfResults');
     
     let searchTimeout;
-    let currentFilters = { show_expired: true };
+    let currentPage = 1;
+    const limitPerPage = 25;
+    let totalAvailable = 0;
+    
+    let currentFilters = { 
+        show_expired: true,
+        page: 1,
+        limit: limitPerPage
+    };
     
     // Initialize
     init();
     
     function init() {
-        loadJobs();
+        loadJobs(false);
         
         searchInput.addEventListener('input', debounceSearch);
         locationInput.addEventListener('input', debounceSearch);
@@ -385,6 +429,7 @@ include 'includes/header.php';
         experienceSelect.addEventListener('change', updateFiltersAndLoad);
         sortBy.addEventListener('change', updateFiltersAndLoad);
         clearFiltersBtn.addEventListener('click', clearAllFilters);
+        loadMoreBtn.addEventListener('click', loadMore);
         
         readUrlParams();
     }
@@ -397,6 +442,7 @@ include 'includes/header.php';
     }
     
     function updateFiltersAndLoad() {
+        currentPage = 1;
         currentFilters = {
             search: searchInput.value.trim(),
             category: categorySelect.value,
@@ -405,16 +451,30 @@ include 'includes/header.php';
             employment_type: employmentTypeSelect.value,
             experience_level: experienceSelect.value,
             sort: sortBy.value,
-            show_expired: true
+            show_expired: true,
+            page: currentPage,
+            limit: limitPerPage
         };
         
         updateUrl();
         displayActiveFilters();
-        loadJobs();
+        loadJobs(false); // false = replace content
     }
     
-    function loadJobs() {
-        loadingOverlay.classList.add('active');
+    function loadMore() {
+        currentPage++;
+        currentFilters.page = currentPage;
+        loadJobs(true); // true = append content
+    }
+    
+    function loadJobs(append = false) {
+        if (!append) {
+            loadingOverlay.classList.add('active');
+            jobsContainer.innerHTML = ''; // Clear for new search
+        }
+        
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
         
         const params = new URLSearchParams(currentFilters);
         
@@ -423,34 +483,55 @@ include 'includes/header.php';
             .then(data => {
                 loadingOverlay.classList.remove('active');
                 
-                const count = data.jobs.length;
-                resultsCount.textContent = `${count} archived job${count !== 1 ? 's' : ''} found`;
+                totalAvailable = data.total;
+                const shownSoFar = append ? (jobsContainer.children.length + data.jobs.length) : data.jobs.length;
                 
-                displayJobs(data.jobs);
+                resultsCount.textContent = `${totalAvailable} expired job${totalAvailable !== 1 ? 's' : ''} found`;
+                
+                displayJobs(data.jobs, append);
+                
+                // Update "Load More" visibility
+                if (totalAvailable > shownSoFar) {
+                    loadMoreContainer.style.display = 'block';
+                    loadMoreBtn.style.display = 'inline-block';
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.innerHTML = '<i class="fas fa-plus me-2"></i> Load More Expired Jobs';
+                    endOfResults.style.display = 'none';
+                } else {
+                    loadMoreBtn.style.display = 'none';
+                    if (totalAvailable > 0) {
+                        loadMoreContainer.style.display = 'block';
+                        endOfResults.style.display = 'block';
+                    } else {
+                        loadMoreContainer.style.display = 'none';
+                    }
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
                 loadingOverlay.classList.remove('active');
-                jobsContainer.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-danger">
-                            <h5 class="alert-heading">⚠️ Failed to Load</h5>
-                            <p>We're having trouble loading archived jobs right now.</p>
-                            <button class="btn btn-sm btn-primary" onclick="location.reload()">🔄 Retry</button>
+                if (!append) {
+                    jobsContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger">
+                                <h5 class="alert-heading">⚠️ Failed to Load</h5>
+                                <p>We're having trouble loading expired jobs right now.</p>
+                                <button class="btn btn-sm btn-primary" onclick="location.reload()">🔄 Retry</button>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             });
     }
     
-    function displayJobs(jobs) {
-        if (jobs.length === 0) {
+    function displayJobs(jobs, append = false) {
+        if (jobs.length === 0 && !append) {
             jobsContainer.innerHTML = `
                 <div class="col-12">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <h3>No Archived Jobs Found</h3>
-                        <p>No jobs match your search criteria in the archive.</p>
+                    <div class="empty-state text-center py-5">
+                        <div class="empty-state-icon fs-1 mb-3">📭</div>
+                        <h3>No Recently Expired Jobs Found</h3>
+                        <p class="text-muted">No jobs matching your search criteria were found among the most recent 100 expirations.</p>
                         <a href="index.php" class="btn btn-primary mt-3">← View Active Jobs</a>
                     </div>
                 </div>
@@ -462,43 +543,35 @@ include 'includes/header.php';
         
         jobs.forEach(job => {
             html += `
-                <div class="col-lg-6 col-xl-4">
-                    <div class="job-card archived">
-                        <div class="job-card-body">
-                            <div class="company-logo">
-                                ${job.company.substring(0, 2).toUpperCase()}
+                <div class="col-lg-6 col-xl-4 job-item-fade">
+                    <div class="job-card archived h-100">
+                        <div class="job-card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="company-logo me-3" style="width: 48px; height: 48px; line-height: 48px; text-align: center; border-radius: 8px; font-weight: bold; color: white;">
+                                    ${job.company.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h5 class="job-card-title mb-0">${escapeHtml(job.title)}</h5>
+                                    <h6 class="job-card-subtitle text-muted mb-0 small">${escapeHtml(job.company)}</h6>
+                                </div>
                             </div>
                             
-                            <h5 class="job-card-title">${escapeHtml(job.title)}</h5>
-                            <h6 class="job-card-subtitle">${escapeHtml(job.company)}</h6>
-                            
-                            <div class="job-info">
-                                ${job.work_mode ? `<span class="job-badge job-badge-blue">${job.work_mode_icon || '🏠'} ${escapeHtml(job.work_mode)}</span>` : ''}
-                                ${job.employment_type ? `<span class="job-badge job-badge-teal">${job.employment_type_icon || '💼'} ${escapeHtml(job.employment_type)}</span>` : ''}
-                                ${job.experience_level ? `<span class="job-badge job-badge-green">${job.experience_level_icon || '🎓'} ${escapeHtml(job.experience_level)}</span>` : ''}
-                                ${job.location ? `<span class="job-badge job-badge-purple">📍 ${escapeHtml(job.location)}</span>` : ''}
-                                ${job.category ? `<span class="job-badge job-badge-orange">${job.category_icon || '🏷️'} ${escapeHtml(job.category)}</span>` : ''}
+                            <div class="job-info mb-3 d-flex flex-wrap gap-2">
+                                ${job.work_mode ? `<span class="badge bg-light text-dark border"><i class="fas fa-laptop-house me-1"></i> ${escapeHtml(job.work_mode)}</span>` : ''}
+                                ${job.employment_type ? `<span class="badge bg-light text-dark border"><i class="fas fa-briefcase me-1"></i> ${escapeHtml(job.employment_type)}</span>` : ''}
+                                ${job.location ? `<span class="badge bg-light text-dark border"><i class="fas fa-map-marker-alt me-1"></i> ${escapeHtml(job.location)}</span>` : ''}
                             </div>
                             
-                            ${job.description ? `
-                                <p class="job-card-text">
-                                    ${escapeHtml(job.description.substring(0, 120))}${job.description.length > 120 ? '...' : ''}
-                                </p>
-                            ` : ''}
-                            
-                            <p class="posted-date">
-                                🕒 Posted: ${formatDate(job.posted_date)}
-                                ${job.application_deadline ? `<br><span class="deadline-expired">⚠️ Expired: ${formatDate(job.application_deadline)}</span>` : ''}
+                            <p class="posted-date small text-muted mb-3">
+                                <i class="far fa-clock me-1"></i> Expired: ${formatDate(job.application_deadline)}
                             </p>
                             
-                            <div class="expired-notice">
-                                <strong>⏰ Application Closed</strong>
-                                This position is no longer accepting applications
+                            <div class="expired-notice mb-3 p-2 rounded" style="background-color: #fff5f5; border: 1px solid #fed7d7; color: #c53030; font-size: 0.8rem;">
+                                <strong><i class="fas fa-ban me-1"></i> Closed</strong> No longer accepting applications.
                             </div>
                             
-                            <a href="job-details.php?slug=${encodeURIComponent(job.slug || 'job-' + job.id)}" 
-                               class="btn-apply btn-archived">
-                                View Details (Archived)
+                            <a href="job-details.php?id=${job.id}" class="btn btn-outline-secondary w-100 btn-sm">
+                                View Details (Expired)
                             </a>
                         </div>
                     </div>
@@ -506,7 +579,12 @@ include 'includes/header.php';
             `;
         });
         
-        jobsContainer.innerHTML = html;
+        if (append) {
+            jobsContainer.insertAdjacentHTML('beforeend', html);
+        } else {
+            jobsContainer.innerHTML = html;
+        }
+        
         animateCards();
     }
     
@@ -526,21 +604,19 @@ include 'includes/header.php';
         }
         
         activeFiltersDiv.style.display = 'flex';
+        activeFiltersDiv.style.flexWrap = 'wrap';
+        activeFiltersDiv.style.gap = '8px';
+        activeFiltersDiv.style.marginBottom = '1rem';
+        
         activeFiltersDiv.innerHTML = filters.map(filter => `
-            <div class="filter-pill">
+            <div class="badge bg-primary d-flex align-items-center p-2" style="font-weight: 500;">
                 ${escapeHtml(filter.label)}
-                <span class="remove-filter" data-filter="${filter.key}">✕</span>
+                <span class="ms-2 ms-auto" style="cursor: pointer;" onclick="window.removeSearchFilter('${filter.key}')">✕</span>
             </div>
         `).join('');
-        
-        document.querySelectorAll('.remove-filter').forEach(btn => {
-            btn.addEventListener('click', function() {
-                removeFilter(this.dataset.filter);
-            });
-        });
     }
     
-    function removeFilter(filterKey) {
+    window.removeSearchFilter = function(filterKey) {
         switch(filterKey) {
             case 'search': searchInput.value = ''; break;
             case 'category': categorySelect.value = ''; break;
@@ -550,7 +626,7 @@ include 'includes/header.php';
             case 'experience_level': experienceSelect.value = ''; break;
         }
         updateFiltersAndLoad();
-    }
+    };
     
     function clearAllFilters() {
         searchInput.value = '';
@@ -566,7 +642,7 @@ include 'includes/header.php';
     function updateUrl() {
         const params = new URLSearchParams();
         Object.keys(currentFilters).forEach(key => {
-            if (currentFilters[key] && key !== 'show_expired') {
+            if (currentFilters[key] && key !== 'show_expired' && key !== 'page' && key !== 'limit') {
                 params.set(key, currentFilters[key]);
             }
         });
@@ -586,28 +662,31 @@ include 'includes/header.php';
         if (params.get('experience_level')) experienceSelect.value = params.get('experience_level');
         if (params.get('sort')) sortBy.value = params.get('sort');
         
-        updateFiltersAndLoad();
+        // Don't trigger another load, init() already calls loadJobs()
     }
     
     function animateCards() {
-        const cards = document.querySelectorAll('.job-card');
+        const cards = document.querySelectorAll('.job-item-fade:not(.animated)');
         cards.forEach((card, index) => {
             card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
+            card.style.transform = 'translateY(15px)';
+            card.classList.add('animated');
             setTimeout(() => {
                 card.style.transition = 'all 0.4s ease';
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
-            }, index * 50);
+            }, index * 40);
         });
     }
     
     function escapeHtml(text) {
+        if (!text) return '';
         const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
         return text.replace(/[&<>"']/g, m => map[m]);
     }
     
     function formatDate(dateString) {
+        if (!dateString) return 'N/A';
         const date = new Date(dateString);
         const options = { day: '2-digit', month: 'short', year: 'numeric' };
         return date.toLocaleDateString('en-IN', options);

@@ -355,7 +355,7 @@ include '../includes/header.php';
                         <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
                             <?php if (!empty($job['category_name'])): ?>
                                 <span>
-                                    <i class="<?= htmlspecialchars($job['category_icon']) ?> me-1"></i>
+                                    <i class="fas fa-tag me-1"></i>
                                     <?= htmlspecialchars($job['category_name']) ?>
                                 </span>
                             <?php endif; ?>

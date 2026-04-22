@@ -16,7 +16,7 @@ $activeJobsCount = $pdo->query("
     AND (application_deadline IS NULL OR application_deadline >= CURDATE())
 ")->fetchColumn();
 
-$archivedJobsCount = $pdo->query("
+$expiredJobsCount = $pdo->query("
     SELECT COUNT(*) FROM jobs 
     WHERE is_active = 1 
     AND application_deadline IS NOT NULL 
@@ -199,7 +199,7 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
         <div class="container">
             <!-- Logo/Brand -->
             <a class="navbar-brand fw-bold" href="<?php echo BASE_PATH; ?>/" aria-label="Job Portal Home">
-                🎯 Job Portal
+                <i class="fas fa-briefcase me-1 text-primary"></i> Job Portal
             </a>
             
             <!-- Mobile Toggle -->
@@ -215,7 +215,7 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                         <a class="nav-link <?php echo $currentPage == 'index.php' ? 'active fw-bold' : ''; ?>" 
                            href="<?php echo BASE_PATH; ?>/"
                            aria-label="View Active Jobs">
-                            🏠 Active Jobs
+                            <i class="fas fa-home me-1"></i> Active Jobs
                             <?php if ($activeJobsCount > 0): ?>
                                 <span class="badge bg-success rounded-pill ms-1" title="<?php echo $activeJobsCount; ?> active jobs">
                                     <?php echo $activeJobsCount; ?>
@@ -224,15 +224,15 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                         </a>
                     </li>
                     
-                    <!-- Archive -->
+                    <!-- Expired Jobs -->
                     <li class="nav-item">
                         <a class="nav-link <?php echo $currentPage == 'archive.php' ? 'active fw-bold' : ''; ?>" 
                            href="<?php echo BASE_PATH; ?>/archive.php"
-                           aria-label="View Archived Jobs">
-                            📚 Archive
-                            <?php if ($archivedJobsCount > 0): ?>
-                                <span class="badge bg-secondary rounded-pill ms-1" title="<?php echo $archivedJobsCount; ?> archived jobs">
-                                    <?php echo $archivedJobsCount; ?>
+                           aria-label="View Expired Jobs">
+                            <i class="fas fa-history me-1"></i> Expired Jobs
+                            <?php if ($expiredJobsCount > 0): ?>
+                                <span class="badge bg-secondary rounded-pill ms-1" title="<?php echo $expiredJobsCount; ?> expired jobs">
+                                    <?php echo $expiredJobsCount > 100 ? '100+' : $expiredJobsCount; ?>
                                 </span>
                             <?php endif; ?>
                         </a>

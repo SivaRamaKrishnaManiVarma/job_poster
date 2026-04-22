@@ -14,6 +14,10 @@ try {
     $stmt->execute([$skillId, $candidateId]);
     
     if ($stmt->rowCount() > 0) {
+        // Invalidate recommendation cache — removed skill affects match scores
+        $_jpCf = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'jp_rec_' . $candidateId . '.cache';
+        if (file_exists($_jpCf)) { @unlink($_jpCf); }
+        unset($_jpCf);
         header('Location: ' . url('profile/edit-profile.php?success=skill_deleted#skills'));
     } else {
         header('Location: ' . url('profile/edit-profile.php?error=Skill not found'));

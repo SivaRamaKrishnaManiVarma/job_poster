@@ -302,7 +302,7 @@ include 'includes/header.php';
     <?php if ($isLoggedIn && !empty($recommendedJobs)): ?>
         <div class="section">
             <div class="section-header">
-                <h2 class="section-title">🎯 Recommended For You</h2>
+                <h2 class="section-title">Recommended For You</h2>
                 <p class="section-subtitle">Jobs matching your profile and interests</p>
             </div>
 
@@ -355,14 +355,13 @@ include 'includes/header.php';
     <!-- Browse by Category -->
     <div class="section">
         <div class="section-header">
-            <h2 class="section-title">🔍 Browse by Category</h2>
+            <h2 class="section-title">Browse by Category</h2>
             <p class="section-subtitle">Explore jobs in your field of interest</p>
         </div>
 
         <div class="category-grid">
             <?php foreach ($topCategories as $category): ?>
                 <a href="<?= url('browse-jobs.php?category=' . $category['id']) ?>" class="category-card">
-                    <span class="category-icon"><?= $category['icon'] ?></span>
                     <div class="category-name"><?= htmlspecialchars($category['category_name']) ?></div>
                     <div class="category-count"><?= $category['job_count'] ?> jobs</div>
                 </a>
@@ -379,7 +378,7 @@ include 'includes/header.php';
     <!-- Latest Jobs -->
     <div class="section" style="background: #f9fafb; margin: 0 -15px; padding: 60px 15px;">
         <div class="section-header">
-            <h2 class="section-title">🆕 Latest Job Openings</h2>
+            <h2 class="section-title">Latest Job Openings</h2>
             <p class="section-subtitle">Fresh opportunities posted recently</p>
         </div>
 
@@ -403,7 +402,7 @@ include 'includes/header.php';
                         <div class="job-tags">
                             <?php if (!empty($job['mode_name'])): ?>
                                 <span class="job-tag">
-                                    <?= $job['work_mode_icon'] ?> <?= htmlspecialchars($job['mode_name']) ?>
+                                    <i class="fas fa-laptop-house me-1"></i><?= htmlspecialchars($job['mode_name']) ?>
                                 </span>
                             <?php endif; ?>
                         </div>
@@ -445,7 +444,7 @@ include 'includes/header.php';
     <!-- Top Companies -->
     <div class="section">
         <div class="section-header">
-            <h2 class="section-title">🏢 Top Companies Hiring</h2>
+            <h2 class="section-title">Top Companies Hiring</h2>
             <p class="section-subtitle">Explore opportunities with leading employers</p>
         </div>
 

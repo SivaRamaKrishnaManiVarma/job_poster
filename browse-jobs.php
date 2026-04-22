@@ -113,7 +113,10 @@ $experienceLevels = $pdo->query("
 $allCategories = $pdo->query("
     SELECT mc.*, COUNT(j.id) AS job_count
     FROM master_job_categories mc
-    LEFT JOIN jobs j ON mc.id = j.job_category_id AND j.is_active = 1
+    LEFT JOIN jobs j
+      ON mc.id = j.job_category_id
+     AND j.is_active = 1
+     AND (j.application_deadline IS NULL OR j.application_deadline >= CURDATE())
     WHERE mc.is_active = 1
     GROUP BY mc.id
     HAVING job_count > 0
@@ -353,7 +356,7 @@ include 'includes/header.php';
     <div class="container">
         <?php if ($categoryInfo): ?>
             <div class="d-flex align-items-center">
-                <span class="fs-1 me-3"><?= $categoryInfo['icon'] ?></span>
+                <i class="fas fa-briefcase fs-2 me-3"></i>
                 <div>
                     <h1><?= htmlspecialchars($categoryInfo['category_name']) ?> Jobs</h1>
                     <p class="mb-0"><?= number_format($totalCount) ?> opportunities available</p>
@@ -399,7 +402,7 @@ include 'includes/header.php';
                         <div style="max-height:300px; overflow-y:auto;">
                             <?php foreach (array_slice($allCategories, 0, 15) as $cat): ?>
                                 <a href="?category=<?= $cat['id'] ?>" class="category-item">
-                                    <span><?= $cat['icon'] ?> <?= htmlspecialchars($cat['category_name']) ?></span>
+                                    <span><?= htmlspecialchars($cat['category_name']) ?></span>
                                     <span class="badge"><?= $cat['job_count'] ?></span>
                                 </a>
                             <?php endforeach; ?>
@@ -409,7 +412,7 @@ include 'includes/header.php';
                     <div class="filter-section">
                         <div class="filter-title">Category</div>
                         <div class="category-item active">
-                            <span><?= $categoryInfo['icon'] ?> <?= htmlspecialchars($categoryInfo['category_name']) ?></span>
+                            <span><?= htmlspecialchars($categoryInfo['category_name']) ?></span>
                         </div>
                         <a href="?" class="btn btn-outline-secondary btn-sm w-100 mt-2">
                             <i class="fas fa-th me-1"></i>View All Categories
@@ -530,7 +533,7 @@ include 'includes/header.php';
 
                     <?php if ($selectedLocation): ?>
                         <div class="filter-tag">
-                            📍 <?= htmlspecialchars($selectedLocation) ?>
+                            <i class="fas fa-map-marker-alt me-1"></i><?= htmlspecialchars($selectedLocation) ?>
                             <a href="<?= buildFilterUrl($currentFilters, 'location') ?>" class="remove">×</a>
                         </div>
                     <?php endif; ?>
@@ -569,7 +572,7 @@ include 'includes/header.php';
                         }
                         ?>
                         <div class="filter-tag">
-                            🎓 <?= htmlspecialchars($expName) ?>
+                            <i class="fas fa-user-tie me-1"></i><?= htmlspecialchars($expName) ?>
                             <a href="<?= buildFilterUrl($currentFilters, 'experience') ?>" class="remove">×</a>
                         </div>
                     <?php endif; ?>
@@ -626,7 +629,7 @@ include 'includes/header.php';
                             <div class="job-meta-info">
                                 <?php if (!empty($job['category_name'])): ?>
                                     <span>
-                                        <?= htmlspecialchars($job['category_icon']) ?>
+                                        <i class="fas fa-tag"></i>
                                         <?= htmlspecialchars($job['category_name']) ?>
                                     </span>
                                 <?php endif; ?>

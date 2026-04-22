@@ -142,6 +142,11 @@ try {
     // Update session name if changed
     $_SESSION['candidate_name'] = $full_name;
     
+    // Invalidate recommendation cache — profile changes affect match scores
+    $_jpCf = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'jp_rec_' . $userId . '.cache';
+    if (file_exists($_jpCf)) { @unlink($_jpCf); }
+    unset($_jpCf);
+
     header('Location: ' . url('profile/edit-profile.php?success=profile_updated#basic'));
     exit;
     

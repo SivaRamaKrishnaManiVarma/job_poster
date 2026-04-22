@@ -1,0 +1,27 @@
+# ============================================
+# Environment & Secrets
+# ============================================
+.env
+.env.*
+!.env.example
+
+# Recommendation cache files (written to system tmp dir)
+# These are auto-managed — no need to track
+jp_rec_*.cache
+
+# ============================================
+# OS / Editor artefacts
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# ============================================
+# IDE
+# ============================================
+.idea/
+.vscode/
+*.sublime-workspace

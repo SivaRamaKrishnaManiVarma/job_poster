@@ -33,6 +33,11 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$userId, $job_category_id, $priority]);
     
+    // Invalidate recommendation cache — category preference affects match scores
+    $_jpCf = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'jp_rec_' . $userId . '.cache';
+    if (file_exists($_jpCf)) { @unlink($_jpCf); }
+    unset($_jpCf);
+
     header('Location: ' . url('profile/edit-profile.php?success=preference_added#preferences'));
     exit;
     

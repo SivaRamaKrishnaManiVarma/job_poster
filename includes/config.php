@@ -5,62 +5,75 @@ if (php_sapi_name() !== 'cli') {
 }
 
 // ============================================
+// LOAD ENVIRONMENT FILE (.env)
+// ============================================
+// env.php provides loadEnvFile(). The .env file is optional — if absent,
+// we fall through to the hardcoded fallback values below.
+require_once __DIR__ . '/env.php';
+loadEnvFile(__DIR__ . '/../.env');
+
+// ============================================
 // ENVIRONMENT DETECTION
 // ============================================
-// Check if running from command line (cron) or web
 if (php_sapi_name() === 'cli') {
-    // Running from command line - assume localhost for development
     $isLocalhost = true;
 } else {
-    // Running from web - check HTTP_HOST
-    $isLocalhost = (isset($_SERVER['HTTP_HOST']) && 
-                    ($_SERVER['HTTP_HOST'] == "localhost" || 
-                     $_SERVER['HTTP_HOST'] == "127.0.0.1"));
+    $isLocalhost = (isset($_SERVER['HTTP_HOST']) &&
+                    ($_SERVER['HTTP_HOST'] === 'localhost' ||
+                     $_SERVER['HTTP_HOST'] === '127.0.0.1'));
 }
 
 // ============================================
 // DATABASE CONFIGURATION
+// Priority: .env value → legacy hardcoded fallback
+// All constant names are unchanged — zero callers affected.
 // ============================================
-if ($isLocalhost) {
-    // LOCALHOST Database
+if (getenv('DB_NAME') !== false) {
+    // .env file is present and parsed
+    define('DB_HOST',    getenv('DB_HOST') ?: 'localhost');
+    define('DB_NAME',    getenv('DB_NAME'));
+    define('DB_USER',    getenv('DB_USER') ?: 'root');
+    define('DB_PASS',    getenv('DB_PASS') ?: '');
+    define('ENVIRONMENT', getenv('APP_ENV') ?: ($isLocalhost ? 'local' : 'production'));
+} elseif ($isLocalhost) {
+    // Legacy localhost fallback
     define('DB_HOST', 'localhost');
     define('DB_NAME', 'job_portal');
     define('DB_USER', 'root');
     define('DB_PASS', '');
     define('ENVIRONMENT', 'local');
 } else {
-    // PRODUCTION Database
+    // Legacy production fallback
     define('DB_HOST', 'localhost');
-    define('DB_NAME', 'u409529889_job_poster');
-    define('DB_USER', 'u409529889_job_poster');
-    define('DB_PASS', '!teKKdx9G');
+    define('DB_NAME', 'u409529889_db_JMqRABK6');
+    define('DB_USER', 'u409529889_usr_JMqRABK6');
+    define('DB_PASS', 'pL8@?CBvh');
     define('ENVIRONMENT', 'production');
 }
 
 // ============================================
 // BASE PATH CONFIGURATION (For URLs)
 // ============================================
-if ($isLocalhost) {
-    // LOCALHOST - with subdirectory /job_poster
+if (getenv('APP_BASE_PATH') !== false) {
+    define('BASE_PATH', getenv('APP_BASE_PATH'));
+} elseif ($isLocalhost) {
     define('BASE_PATH', '/job_poster');
 } else {
-    // PRODUCTION - at root level
     define('BASE_PATH', '');
 }
 
 // ============================================
 // BASE URL CONFIGURATION
 // ============================================
-// Generate full base URL
 if (php_sapi_name() === 'cli') {
-    // Command line - use hardcoded URL
-    if ($isLocalhost) {
+    if (getenv('APP_URL') !== false) {
+        define('BASE_URL', getenv('APP_URL'));
+    } elseif ($isLocalhost) {
         define('BASE_URL', 'http://localhost' . BASE_PATH);
     } else {
-        define('BASE_URL', 'https://findwork.mindrevel.in/' . BASE_PATH); // Update for production
+        define('BASE_URL', 'https://findworks.mindrevel.in/' . BASE_PATH);
     }
 } else {
-    // Web request - detect from HTTP_HOST
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     define('BASE_URL', $protocol . '://' . $_SERVER['HTTP_HOST'] . BASE_PATH);
 }

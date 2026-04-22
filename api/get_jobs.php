@@ -5,6 +5,10 @@ require_once '../includes/functions.php';
 
 try {
     // Get filter parameters
+    $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $limit = isset($_GET['limit']) ? max(1, intval($_GET['limit'])) : 25;
+    $offset = ($page - 1) * $limit;
+    
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
     $category = isset($_GET['category']) ? intval($_GET['category']) : 0;
     $location = isset($_GET['location']) ? trim($_GET['location']) : '';
@@ -12,7 +16,7 @@ try {
     $employment_type = isset($_GET['employment_type']) ? intval($_GET['employment_type']) : 0;
     $experience_level = isset($_GET['experience_level']) ? intval($_GET['experience_level']) : 0;
     $sort = isset($_GET['sort']) ? $_GET['sort'] : 'date_desc';
-    $show_expired = isset($_GET['show_expired']) ? (bool)$_GET['show_expired'] : false;
+    $show_expired = isset($_GET['show_expired']) ? (isset($_GET['show_expired']) && ($_GET['show_expired'] === 'true' || $_GET['show_expired'] == 1)) : false;
     
     // Base query with JOINs
     $sql = "SELECT 
@@ -56,8 +60,10 @@ try {
         // Main page: Show jobs with no deadline OR deadline >= today
         $sql .= " AND (j.application_deadline IS NULL OR j.application_deadline >= CURDATE())";
     } else {
-        // Archive page: Show jobs with deadline < today
+        // Expired jobs: Show jobs with deadline < today, limited to top 100 recently ended
+        // We use a subquery to ensure we only look at the 100 most recent expirations
         $sql .= " AND j.application_deadline IS NOT NULL AND j.application_deadline < CURDATE()";
+        $sql .= " AND j.id IN (SELECT id FROM (SELECT id FROM jobs WHERE is_active = 1 AND application_deadline < CURDATE() ORDER BY application_deadline DESC LIMIT 100) as expired_pool)";
     }
     
     // Search filter
@@ -119,29 +125,66 @@ try {
             break;
     }
     
-    // Limit results
-    $sql .= " LIMIT 200";
+    // Final pagination limit and offset
+    $sql .= " LIMIT ? OFFSET ?";
+    $params[] = $limit;
+    $params[] = $offset;
     
     // Execute query
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Get total active jobs count (for stats)
-    $totalSql = "SELECT COUNT(*) FROM jobs WHERE is_active = 1";
+    // Get total count for this filtered view (respecting the 100 limit if expired)
+    $totalSql = "SELECT COUNT(*) FROM jobs j WHERE j.is_active = 1";
+    $totalParams = [];
     if (!$show_expired) {
-        $totalSql .= " AND (application_deadline IS NULL OR application_deadline >= CURDATE())";
+        $totalSql .= " AND (j.application_deadline IS NULL OR j.application_deadline >= CURDATE())";
     } else {
-        $totalSql .= " AND application_deadline IS NOT NULL AND application_deadline < CURDATE()";
+        $totalSql .= " AND j.application_deadline IS NOT NULL AND j.application_deadline < CURDATE()";
+        $totalSql .= " AND j.id IN (SELECT id FROM (SELECT id FROM jobs WHERE is_active = 1 AND application_deadline < CURDATE() ORDER BY application_deadline DESC LIMIT 100) as expired_pool)";
     }
-    $total = $pdo->query($totalSql)->fetchColumn();
+    
+    // Apply the same filters to total count query
+    if (!empty($search)) {
+        $totalSql .= " AND (j.title LIKE ? OR j.company LIKE ? OR j.description LIKE ?)";
+        $totalParams[] = '%' . $search . '%';
+        $totalParams[] = '%' . $search . '%';
+        $totalParams[] = '%' . $search . '%';
+    }
+    if ($category > 0) {
+        $totalSql .= " AND j.job_category_id = ?";
+        $totalParams[] = $category;
+    }
+    if (!empty($location)) {
+        $totalSql .= " AND (j.location LIKE ?)";
+        $totalParams[] = '%' . $location . '%';
+    }
+    if ($work_mode > 0) {
+        $totalSql .= " AND j.work_mode_id = ?";
+        $totalParams[] = $work_mode;
+    }
+    if ($employment_type > 0) {
+        $totalSql .= " AND j.employment_type_id = ?";
+        $totalParams[] = $employment_type;
+    }
+    if ($experience_level > 0) {
+        $totalSql .= " AND j.experience_level_id = ?";
+        $totalParams[] = $experience_level;
+    }
+    
+    $totalStmt = $pdo->prepare($totalSql);
+    $totalStmt->execute($totalParams);
+    $total = $totalStmt->fetchColumn();
     
     // Return JSON response
     echo json_encode([
         'success' => true,
         'jobs' => $jobs,
         'count' => count($jobs),
-        'total' => $total,
+        'total' => (int)$total,
+        'page' => $page,
+        'limit' => $limit,
         'filters_applied' => [
             'search' => $search,
             'category' => $category,

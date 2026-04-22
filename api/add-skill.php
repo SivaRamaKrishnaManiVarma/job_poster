@@ -44,6 +44,11 @@ try {
         $years_of_experience
     ]);
     
+    // Invalidate recommendation cache — new skill affects match scores
+    $_jpCf = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'jp_rec_' . $userId . '.cache';
+    if (file_exists($_jpCf)) { @unlink($_jpCf); }
+    unset($_jpCf);
+
     header('Location: ' . url('profile/edit-profile.php?success=skill_added#skills'));
     exit;
     
