@@ -75,3 +75,24 @@ function loadEnvFile(string $filePath): void
         $_SERVER[$key] = $value;
     }
 }
+
+/**
+ * Get environment variable value
+ * Checks $_ENV, $_SERVER, and getenv() to be resilient against shared hosting restrictions
+ * where putenv() might be disabled.
+ */
+if (!function_exists('env')) {
+    function env(string $key, $default = false) {
+        if (isset($_ENV[$key])) {
+            return $_ENV[$key];
+        }
+        if (isset($_SERVER[$key])) {
+            return $_SERVER[$key];
+        }
+        $val = getenv($key);
+        if ($val !== false) {
+            return $val;
+        }
+        return $default;
+    }
+}

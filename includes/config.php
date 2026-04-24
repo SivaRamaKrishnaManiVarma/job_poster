@@ -28,13 +28,13 @@ if (php_sapi_name() === 'cli') {
 // Priority: .env value → legacy hardcoded fallback
 // All constant names are unchanged — zero callers affected.
 // ============================================
-if (getenv('DB_NAME') !== false) {
+if (env('DB_NAME') !== false) {
     // .env file is present and parsed
-    define('DB_HOST',    getenv('DB_HOST') ?: 'localhost');
-    define('DB_NAME',    getenv('DB_NAME'));
-    define('DB_USER',    getenv('DB_USER') ?: 'root');
-    define('DB_PASS',    getenv('DB_PASS') ?: '');
-    define('ENVIRONMENT', getenv('APP_ENV') ?: ($isLocalhost ? 'local' : 'production'));
+    define('DB_HOST',    env('DB_HOST') ?: 'localhost');
+    define('DB_NAME',    env('DB_NAME'));
+    define('DB_USER',    env('DB_USER') ?: 'root');
+    define('DB_PASS',    env('DB_PASS') ?: '');
+    define('ENVIRONMENT', env('APP_ENV') ?: ($isLocalhost ? 'local' : 'production'));
 } elseif ($isLocalhost) {
     // Legacy localhost fallback
     define('DB_HOST', 'localhost');
@@ -54,8 +54,8 @@ if (getenv('DB_NAME') !== false) {
 // ============================================
 // BASE PATH CONFIGURATION (For URLs)
 // ============================================
-if (getenv('APP_BASE_PATH') !== false) {
-    define('BASE_PATH', getenv('APP_BASE_PATH'));
+if (env('APP_BASE_PATH') !== false) {
+    define('BASE_PATH', env('APP_BASE_PATH'));
 } elseif ($isLocalhost) {
     define('BASE_PATH', '/job_poster');
 } else {
@@ -66,8 +66,8 @@ if (getenv('APP_BASE_PATH') !== false) {
 // BASE URL CONFIGURATION
 // ============================================
 if (php_sapi_name() === 'cli') {
-    if (getenv('APP_URL') !== false) {
-        define('BASE_URL', getenv('APP_URL'));
+    if (env('APP_URL') !== false) {
+        define('BASE_URL', env('APP_URL'));
     } elseif ($isLocalhost) {
         define('BASE_URL', 'http://localhost' . BASE_PATH);
     } else {
@@ -123,7 +123,11 @@ try {
     if (php_sapi_name() === 'cli') {
         die("Database connection failed. Check error logs.\n");
     } else {
-        die("Database connection error. Please contact administrator.");
+        if (isset($_GET['debug_db']) && $_GET['debug_db'] === '1') {
+            die("Database connection error. Details: " . $e->getMessage() . " <br><br><b>Host:</b> " . DB_HOST . "<br><b>User:</b> " . DB_USER . "<br><b>DB:</b> " . DB_NAME);
+        } else {
+            die("Database connection error. Please contact administrator.");
+        }
     }
 }
 
