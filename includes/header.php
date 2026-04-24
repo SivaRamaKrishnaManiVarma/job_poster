@@ -79,6 +79,7 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
+    <meta name="color-scheme" content="light dark">
     
     <!-- Geo Tags -->
     <meta name="geo.region" content="IN">
@@ -95,6 +96,11 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <!-- Font Awesome for Icons -->
@@ -254,8 +260,7 @@ $ogImage = BASE_URL . '/assets/images/og-image.jpg';
                            aria-label="Contact Us">
                             📧 Contact
                         </a>
-                    </li> --v
-                    
+                    </li> -->                    
                     <!-- Candidate Authentication Menu -->
                     <?php if (function_exists('isCandidateLoggedIn') && isCandidateLoggedIn()): ?>
                         <!-- Logged In Candidate -->

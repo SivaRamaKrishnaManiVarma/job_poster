@@ -37,116 +37,88 @@
 
 
 /* -----------------------------------------------------------------------
- * 1. TOKENS & CUSTOM PROPERTIES
+ * 1. TOKENS & DESIGN SYSTEM
  * ----------------------------------------------------------------------- */
 :root {
-    /* Brand */
-    --jp-primary:        #3B66F5;
-    --jp-primary-dark:   #2a52d4;
-    --jp-primary-light:  #EEF3FF;
-    --jp-navy:           #05264E;
+    /* --- Internshala Style Corporate Theme --- */
+    --jp-primary:        #008bdc; /* Internshala Blue */
+    --jp-primary-dark:   #0073b7;
+    --jp-primary-light:  #e6f4fc;
+    
+    /* Neutral / Text */
+    --jp-bg-page:        #f8f9fa; /* Light Gray Background */
+    --jp-bg-card:        #ffffff; /* White Cards */
+    --jp-bg-subtle:      #f1f3f5;
+    --jp-text-heading:   #333333; /* Dark Charcoal */
+    --jp-text-body:      #555555; /* Medium Gray */
+    --jp-text-muted:     #888888; /* Light Gray */
+    --jp-border:         #eeeeee; /* Very Soft Border */
+    --jp-border-hover:   #dddddd;
+    
+    /* Feedback */
+    --jp-success:        #10b981;
+    --jp-success-bg:     #ecfdf5;
+    --jp-danger:         #ef4444;
+    --jp-danger-bg:      #fef2f2;
+    --jp-warning:        #f59e0b;
+    --jp-warning-bg:     #fffbeb;
+    --jp-info:           #0ea5e9;
+    --jp-info-bg:        #f0f9ff;
 
-    /* Status */
-    --jp-success:        #0BA25D;
-    --jp-success-light:  #E6F7EF;
-    --jp-danger:         #E53935;
-    --jp-danger-light:   #FDECEA;
-    --jp-warning:        #F59E0B;
-    --jp-warning-light:  #FEF3C7;
-    --jp-info:           #0EA5E9;
-    --jp-info-light:     #E0F2FE;
+    /* Shadows - Soft & Flat */
+    --jp-shadow-sm:      0 1px 2px rgba(0, 0, 0, 0.04);
+    --jp-shadow:         0 2px 8px rgba(0, 0, 0, 0.06);
+    --jp-shadow-md:      0 4px 12px rgba(0, 0, 0, 0.08);
+    --jp-glass-bg:       rgba(255, 255, 255, 0.98);
+    --jp-glass-border:   rgba(255, 255, 255, 0.9);
 
-    /* Text */
-    --jp-text-heading:   #05264E;
-    --jp-text-body:      #4B5563;
-    --jp-text-muted:     #9CA3AF;
+    /* Legacy Aliases */
+    --dark-blue:         var(--jp-text-heading);
+    --light-blue:        var(--jp-primary);
+    --very-light-blue:   var(--jp-primary-light);
+    --text-dark:         var(--jp-text-heading);
+    --text-gray:         var(--jp-text-body);
+    --border-gray:       var(--jp-border);
 
-    /* Surfaces */
-    --jp-bg-page:        #F0F4FF;
-    --jp-bg-card:        #FFFFFF;
-    --jp-bg-subtle:      #F3F6FF;
-
-    /* Borders */
-    --jp-border:         #E5E7EB;
-    --jp-border-focus:   #3B66F5;
-
-    /* Legacy aliases used by inline styles in index.php & browse-jobs.php */
-    --dark-blue:         #05264E;
-    --light-blue:        #3B66F5;
-    --very-light-blue:   #EEF3FF;
-    --text-dark:         #05264E;
-    --text-gray:         #4B5563;
-    --border-gray:       #E5E7EB;
-
-    /* Shadows */
-    --jp-shadow-xs:  0 1px 3px rgba(59, 102, 245, 0.05);
-    --jp-shadow-sm:  0 2px 8px  rgba(59, 102, 245, 0.08);
-    --jp-shadow:     0 4px 16px rgba(59, 102, 245, 0.10);
-    --jp-shadow-md:  0 8px 28px rgba(59, 102, 245, 0.12);
-    --jp-shadow-lg:  0 16px 44px rgba(59, 102, 245, 0.15);
-
-    /* Radii */
-    --jp-radius-xs:   4px;
-    --jp-radius-sm:   8px;
-    --jp-radius:      12px;
-    --jp-radius-md:   16px;
-    --jp-radius-lg:   20px;
-    --jp-radius-xl:   28px;
-    --jp-radius-pill: 999px;
+    /* Radii - Slightly sharper for corporate look */
+    --jp-radius-sm:      4px;
+    --jp-radius:         6px;
+    --jp-radius-lg:      8px;
+    --jp-radius-xl:      12px;
+    --jp-radius-pill:    50px;
 
     /* Motion */
-    --jp-ease:       cubic-bezier(0.4, 0, 0.2, 1);
-    --jp-transition: all 0.25s var(--jp-ease);
+    --jp-ease:           cubic-bezier(0.4, 0, 0.2, 1);
+    --jp-transition:     all 0.2s var(--jp-ease);
+}
 
-    /* Bootstrap overrides */
-    --bs-primary:    #3B66F5;
-    --bs-primary-rgb: 59, 102, 245;
+@media (prefers-color-scheme: dark) {
+    /* Intentionally blank to force the light corporate theme across all system preferences */
 }
 
 
 /* -----------------------------------------------------------------------
- * 2. GOOGLE FONT IMPORT
+ * 2. BASE & TYPOGRAPHY
  * ----------------------------------------------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-
-/* -----------------------------------------------------------------------
- * 3. BASE RESET
- * ----------------------------------------------------------------------- */
-*,
-*::before,
-*::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
 
 body {
-    font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 16px;
-    line-height: 1.65;
+    line-height: 1.6;
     color: var(--jp-text-body);
     background-color: var(--jp-bg-page);
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-img { max-width: 100%; display: block; }
-
-/* Focus ring — AA accessibility */
-:focus-visible {
-    outline: 3px solid var(--jp-primary);
-    outline-offset: 3px;
-    border-radius: var(--jp-radius-xs);
-}
-
-
-/* -----------------------------------------------------------------------
- * 4. TYPOGRAPHY
- * ----------------------------------------------------------------------- */
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+    font-family: 'Outfit', sans-serif;
     color: var(--jp-text-heading);
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.2;
     margin-bottom: 0.5rem;
 }
 
@@ -158,21 +130,63 @@ a {
 
 a:hover { color: var(--jp-primary-dark); }
 
-.text-muted { color: var(--jp-text-muted) !important; }
-
+/* Custom Focus Ring for AA Accessibility */
+:focus-visible {
+    outline: 2px solid var(--jp-primary);
+    outline-offset: 4px;
+}
 
 /* -----------------------------------------------------------------------
- * 5. NAVIGATION
+ * 3. NAVIGATION (Theme Aware)
  * ----------------------------------------------------------------------- */
 .navbar {
     background: #FFFFFF !important;
     border-bottom: 1px solid var(--jp-border);
-    padding-top:    0.75rem;
-    padding-bottom: 0.75rem;
+    padding: 0.75rem 0;
     position: sticky;
     top: 0;
     z-index: 1030;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.navbar-brand {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--jp-text-heading) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-brand .fa-briefcase {
+    background: linear-gradient(135deg, var(--jp-primary), #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar-nav .nav-link {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--jp-text-body) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--jp-radius-sm);
+    transition: var(--jp-transition);
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: var(--jp-primary) !important;
+    background: var(--jp-primary-light);
+}
+
+.navbar-nav .btn-primary {
+    background: var(--jp-primary) !important;
+    border: none !important;
+    border-radius: var(--jp-radius) !important;
+    padding: 0.625rem 1.25rem !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .navbar-brand {
@@ -276,72 +290,50 @@ a:hover { color: var(--jp-primary-dark); }
 
 /* ── Homepage hero ── */
 .hero-banner {
-    background: linear-gradient(145deg, #EDF2FF 0%, #F0F4FF 50%, #E8EEFF 100%) !important;
-    color: var(--jp-navy) !important;
-    padding: 90px 0 80px !important;
+    background: #FFFFFF !important;
+    color: var(--jp-text-heading) !important;
+    padding: 80px 0 60px !important;
     position: relative;
-    overflow: hidden;
+    border-bottom: 1px solid var(--jp-border);
 }
 
-.hero-banner::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(59, 102, 245, 0.08) 0%, transparent 65%);
-    top: -150px;
-    right: -100px;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.hero-banner::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><circle cx="1" cy="1" r="1" fill="rgba(59,102,245,0.06)"/></svg>');
-    background-size: 40px 40px;
-    pointer-events: none;
-}
-
-.hero-content { position: relative; z-index: 2; }
+.hero-content { position: relative; z-index: 2; text-align: center; }
 
 /* Override inline colour set by PHP */
 .hero-banner .hero-title {
-    font-size: clamp(2rem, 4.5vw, 3.25rem) !important;
+    font-size: clamp(2rem, 4vw, 3rem) !important;
     font-weight: 800 !important;
-    color: var(--jp-navy) !important;
+    color: var(--jp-text-heading) !important;
     letter-spacing: -0.5px;
-    line-height: 1.15;
-    text-shadow: none !important;
+    line-height: 1.2;
+    margin-bottom: 1rem;
 }
 
 .hero-banner .hero-subtitle {
-    font-size: clamp(1rem, 2vw, 1.2rem) !important;
+    font-size: 1.125rem !important;
     color: var(--jp-text-body) !important;
-    opacity: 1 !important;
-    font-weight: 500;
-    max-width: 520px;
+    font-weight: 400;
+    max-width: 600px;
     margin: 0 auto 2.5rem;
 }
 
 /* ── Capsule search inside hero ── */
 .search-box-hero {
     background: #FFFFFF !important;
-    border: 2px solid var(--jp-border) !important;
-    border-radius: var(--jp-radius-pill) !important;
-    padding: 6px 6px 6px 1.5rem !important;
-    box-shadow: var(--jp-shadow-md) !important;
-    max-width: 660px !important;
-    margin: 0 auto 1rem !important;
+    border: 1px solid var(--jp-border) !important;
+    border-radius: var(--jp-radius-sm) !important;
+    padding: 4px 4px 4px 1rem !important;
+    box-shadow: var(--jp-shadow-sm) !important;
+    max-width: 700px !important;
+    margin: 0 auto 1.5rem !important;
     display: flex !important;
     align-items: center;
-    transition: border-color 0.25s, box-shadow 0.25s;
+    transition: var(--jp-transition);
 }
 
 .search-box-hero:focus-within {
     border-color: var(--jp-primary) !important;
-    box-shadow: 0 0 0 4px rgba(59, 102, 245, 0.12), var(--jp-shadow-md) !important;
+    box-shadow: 0 0 0 3px var(--jp-primary-light) !important;
 }
 
 .search-box-hero form {
@@ -355,79 +347,61 @@ a:hover { color: var(--jp-primary-dark); }
     flex: 1 !important;
     border: none !important;
     background: transparent !important;
-    padding: 0.75rem 0 !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.9375rem !important;
-    color: var(--jp-navy) !important;
-    font-weight: 500;
+    padding: 0.875rem 0 !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem !important;
+    color: var(--jp-text-heading) !important;
+    font-weight: 400;
     outline: none !important;
-    border-radius: 0 !important;
 }
 
 .search-box-hero input::placeholder {
     color: var(--jp-text-muted);
-    font-weight: 400;
 }
 
 .search-box-hero button {
     background: var(--jp-primary) !important;
     color: #FFFFFF !important;
     border: none !important;
-    padding: 0.75rem 2rem !important;
-    border-radius: var(--jp-radius-pill) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.9375rem !important;
-    font-weight: 700 !important;
+    padding: 0.875rem 2.5rem !important;
+    border-radius: var(--jp-radius-sm) !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
     cursor: pointer;
     transition: var(--jp-transition);
     white-space: nowrap;
-    flex-shrink: 0;
 }
 
 .search-box-hero button:hover {
     background: var(--jp-primary-dark) !important;
-    transform: none;
 }
 
 /* ── Browse-jobs page header ── */
 .browse-header {
-    background: linear-gradient(130deg, #2a52d4 0%, #3B66F5 100%) !important;
-    color: #FFFFFF !important;
-    padding: 48px 0 !important;
-    margin-bottom: 32px !important;
-    border-bottom: none !important;
-    position: relative;
-    overflow: hidden;
-}
-
-.browse-header::before {
-    content: '';
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-    top: -180px;
-    right: -80px;
-    pointer-events: none;
+    background: #FFFFFF !important;
+    color: var(--jp-text-heading) !important;
+    padding: 40px 0 !important;
+    margin-bottom: 24px !important;
+    border-bottom: 1px solid var(--jp-border) !important;
 }
 
 .browse-header h1 {
-    font-size: 2rem !important;
-    font-weight: 800 !important;
-    color: #FFFFFF !important;
-    margin-bottom: 0.375rem;
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: var(--jp-text-heading) !important;
+    margin-bottom: 0.25rem;
 }
 
 .browse-header p {
     font-size: 1rem !important;
-    color: rgba(255,255,255,0.85) !important;
-    opacity: 1 !important;
+    color: var(--jp-text-body) !important;
 }
 
 .browse-header .fas.fa-briefcase {
-    color: rgba(255,255,255,0.7) !important;
+    color: var(--jp-primary) !important;
 }
+
 
 
 /* -----------------------------------------------------------------------
@@ -503,117 +477,79 @@ a:hover { color: var(--jp-primary-dark); }
  * ----------------------------------------------------------------------- */
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
-    gap: 20px !important;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+    gap: 1.5rem !important;
 }
 
 .category-card {
     background: #FFFFFF !important;
-    border: 2px solid var(--jp-border) !important;
+    border: 1px solid var(--jp-border) !important;
     border-radius: var(--jp-radius-md) !important;
-    padding: 28px 16px !important;
+    padding: 1.5rem 1rem !important;
     text-align: center !important;
     text-decoration: none !important;
     transition: var(--jp-transition) !important;
     display: block !important;
     position: relative;
-    overflow: hidden;
-}
-
-.category-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--jp-primary-light);
-    opacity: 0;
-    transition: opacity 0.25s var(--jp-ease);
-    border-radius: inherit;
+    box-shadow: var(--jp-shadow-sm) !important;
 }
 
 .category-card:hover {
     border-color: var(--jp-primary) !important;
-    transform: translateY(-5px) !important;
-    box-shadow: var(--jp-shadow-md) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--jp-shadow) !important;
     color: inherit !important;
 }
 
-.category-card:hover::before { opacity: 1; }
-
 .category-icon {
-    font-size: 2.25rem !important;
-    margin-bottom: 14px !important;
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
     display: block !important;
-    position: relative;
-    z-index: 1;
-    line-height: 1;
+    color: var(--jp-primary) !important;
 }
 
 .category-name {
-    font-weight: 700 !important;
-    color: var(--jp-navy) !important;
-    font-size: 0.875rem !important;
-    margin-bottom: 6px !important;
-    position: relative;
-    z-index: 1;
-    line-height: 1.3;
+    font-weight: 600 !important;
+    color: var(--jp-text-heading) !important;
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem !important;
 }
 
 .category-count {
     color: var(--jp-text-muted) !important;
-    font-size: 0.8125rem !important;
-    font-weight: 500;
-    position: relative;
-    z-index: 1;
+    font-size: 0.875rem !important;
 }
-
 
 /* -----------------------------------------------------------------------
  * 10. JOB CARDS — COMPACT (index.php uses .job-card-compact)
  * ----------------------------------------------------------------------- */
 .job-card-compact {
     background: #FFFFFF !important;
-    border: 1.5px solid var(--jp-border) !important;
+    border: 1px solid var(--jp-border) !important;
     border-radius: var(--jp-radius-md) !important;
-    padding: 24px !important;
+    padding: 1.5rem !important;
     transition: var(--jp-transition) !important;
     height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
     text-decoration: none !important;
     color: inherit !important;
-    position: relative;
-    overflow: hidden;
-}
-
-.job-card-compact::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--jp-primary);
-    transform: scaleY(0);
-    transform-origin: top;
-    transition: transform 0.3s var(--jp-ease);
-    border-radius: 0 var(--jp-radius-xs) var(--jp-radius-xs) 0;
+    box-shadow: var(--jp-shadow-sm) !important;
 }
 
 .job-card-compact:hover {
-    border-color: rgba(59, 102, 245, 0.3) !important;
-    box-shadow: var(--jp-shadow-md) !important;
-    transform: translateY(-4px) !important;
+    border-color: var(--jp-primary) !important;
+    box-shadow: var(--jp-shadow) !important;
+    transform: translateY(-2px) !important;
     color: inherit !important;
     text-decoration: none !important;
 }
 
-.job-card-compact:hover::before { transform: scaleY(1); }
-
 .job-company {
     color: var(--jp-primary) !important;
     font-weight: 600 !important;
-    font-size: 0.8125rem !important;
-    margin-bottom: 6px !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.5rem !important;
     display: flex;
     align-items: center;
     gap: 0.375rem;
@@ -621,75 +557,73 @@ a:hover { color: var(--jp-primary-dark); }
 
 .job-title {
     font-weight: 700 !important;
-    color: var(--jp-navy) !important;
-    font-size: 1rem !important;
-    margin-bottom: 14px !important;
+    color: var(--jp-text-heading) !important;
+    font-size: 1.125rem !important;
+    margin-bottom: 1rem !important;
     line-height: 1.4 !important;
 }
 
 .job-meta {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 10px !important;
-    font-size: 0.8125rem !important;
+    gap: 0.75rem !important;
+    font-size: 0.875rem !important;
     color: var(--jp-text-muted) !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 1.5rem !important;
 }
 
 .job-meta span {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 0.25rem;
 }
 
 .job-tags {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 6px !important;
+    gap: 0.5rem !important;
     margin-top: auto;
 }
 
 .job-tag {
-    background: var(--jp-primary-light) !important;
-    color: var(--jp-primary) !important;
-    border: 1px solid rgba(59, 102, 245, 0.2) !important;
-    padding: 4px 12px !important;
-    border-radius: var(--jp-radius-pill) !important;
+    background: var(--jp-bg-subtle) !important;
+    color: var(--jp-text-body) !important;
+    border: 1px solid var(--jp-border) !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: var(--jp-radius-sm) !important;
     font-size: 0.75rem !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
 }
 
 .match-badge-small {
     display: inline-block !important;
-    background: var(--jp-success) !important;
-    color: #FFFFFF !important;
-    padding: 4px 12px !important;
-    border-radius: var(--jp-radius-pill) !important;
+    background: var(--jp-success-bg) !important;
+    color: var(--jp-success) !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: var(--jp-radius-sm) !important;
     font-size: 0.75rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 12px !important;
-    letter-spacing: 0.3px;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+    border: 1px solid var(--jp-success);
 }
 
 
 /* -----------------------------------------------------------------------
- * 11.  BROWSE JOB PAGE — HEADER already handled in §6 (.browse-header)
- * -----------------------------------------------------------------------
  * 12. FILTER SIDEBAR
  * ----------------------------------------------------------------------- */
 .filter-sidebar {
     background: #FFFFFF !important;
-    border: 1.5px solid var(--jp-border) !important;
+    border: 1px solid var(--jp-border) !important;
     border-radius: var(--jp-radius-md) !important;
-    padding: 24px !important;
-    position: sticky;
-    top: 88px;
-    box-shadow: var(--jp-shadow-xs);
+    padding: 1.5rem !important;
+    position: sticky !important;
+    top: 100px !important;
+    box-shadow: var(--jp-shadow-sm) !important;
 }
 
 .filter-section {
-    margin-bottom: 22px !important;
-    padding-bottom: 22px !important;
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
     border-bottom: 1px solid var(--jp-border) !important;
 }
 
@@ -700,51 +634,50 @@ a:hover { color: var(--jp-primary-dark); }
 }
 
 .filter-title {
-    font-size: 0.75rem !important;
-    font-weight: 800 !important;
-    color: var(--jp-navy) !important;
-    margin-bottom: 12px !important;
+    font-size: 0.8125rem !important;
+    font-weight: 700 !important;
+    color: var(--jp-text-heading) !important;
+    margin-bottom: 1rem !important;
     text-transform: uppercase !important;
-    letter-spacing: 1px !important;
+    letter-spacing: 0.5px !important;
 }
 
 /* Sidebar search box */
 .search-box {
-    position: relative;
-    margin-bottom: 10px !important;
+    position: relative !important;
+    margin-bottom: 1rem !important;
 }
 
 .search-box input {
-    padding: 10px 12px 10px 38px !important;
-    border: 1.5px solid var(--jp-border) !important;
+    padding: 0.625rem 0.875rem 0.625rem 2.5rem !important;
+    border: 1px solid var(--jp-border) !important;
     border-radius: var(--jp-radius-sm) !important;
-    font-family: inherit;
     font-size: 0.875rem !important;
-    width: 100%;
-    color: var(--jp-navy);
-    transition: var(--jp-transition);
-    background: #FFFFFF;
+    width: 100% !important;
+    color: var(--jp-text-heading) !important;
+    transition: var(--jp-transition) !important;
+    background: #FFFFFF !important;
 }
 
 .search-box input:focus {
     border-color: var(--jp-primary) !important;
-    box-shadow: 0 0 0 3px rgba(59, 102, 245, 0.1) !important;
-    outline: none;
+    box-shadow: 0 0 0 2px var(--jp-primary-light) !important;
+    outline: none !important;
 }
 
 .search-box i {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--jp-text-muted);
-    font-size: 0.8125rem;
+    position: absolute !important;
+    left: 0.875rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: var(--jp-text-muted) !important;
+    font-size: 0.875rem !important;
 }
 
 /* Category items within sidebar */
 .category-item {
-    padding: 9px 12px !important;
-    margin-bottom: 3px !important;
+    padding: 0.5rem 0.75rem !important;
+    margin-bottom: 0.25rem !important;
     border-radius: var(--jp-radius-sm) !important;
     display: flex !important;
     justify-content: space-between !important;
@@ -754,36 +687,31 @@ a:hover { color: var(--jp-primary-dark); }
     font-size: 0.875rem !important;
     font-weight: 500 !important;
     transition: var(--jp-transition) !important;
-    border: 1px solid transparent !important;
 }
 
 .category-item:hover {
-    background: var(--jp-primary-light) !important;
-    color: var(--jp-primary) !important;
-    border-color: rgba(59, 102, 245, 0.2) !important;
+    background: var(--jp-bg-subtle) !important;
+    color: var(--jp-text-heading) !important;
 }
 
 .category-item.active {
     background: var(--jp-primary-light) !important;
     color: var(--jp-primary) !important;
-    font-weight: 700 !important;
-    border-color: rgba(59, 102, 245, 0.3) !important;
+    font-weight: 600 !important;
 }
 
 .category-item .badge {
-    background: var(--jp-bg-subtle) !important;
+    background: var(--jp-border) !important;
     color: var(--jp-text-muted) !important;
     font-size: 0.6875rem !important;
     font-weight: 600 !important;
-    padding: 3px 8px !important;
+    padding: 0.125rem 0.5rem !important;
     border-radius: var(--jp-radius-pill) !important;
-    border: 1px solid var(--jp-border);
 }
 
 .category-item.active .badge {
-    background: rgba(59, 102, 245, 0.15) !important;
-    color: var(--jp-primary)  !important;
-    border-color: rgba(59, 102, 245, 0.2) !important;
+    background: var(--jp-primary) !important;
+    color: #FFFFFF !important;
 }
 
 
@@ -794,73 +722,48 @@ a:hover { color: var(--jp-primary-dark); }
 /* Results info bar */
 .results-info {
     background: #FFFFFF !important;
-    padding: 14px 18px !important;
-    border-radius: var(--jp-radius-sm) !important;
-    border: 1.5px solid var(--jp-border) !important;
-    margin-bottom: 16px !important;
-    font-size: 0.9rem !important;
-    box-shadow: var(--jp-shadow-xs);
+    padding: 1rem 1.25rem !important;
+    border-radius: var(--jp-radius-md) !important;
+    border: 1px solid var(--jp-border) !important;
+    margin-bottom: 1.5rem !important;
+    font-size: 0.875rem !important;
+    box-shadow: var(--jp-shadow-sm) !important;
 }
 
-.results-info strong { color: var(--jp-primary); }
+.results-info strong { color: var(--jp-text-heading) !important; font-weight: 700; }
 
 /* Row job card */
 .job-card {
     background: #FFFFFF !important;
-    border: 1.5px solid var(--jp-border) !important;
+    border: 1px solid var(--jp-border) !important;
     border-radius: var(--jp-radius-md) !important;
-    padding: 18px 20px !important;
-    margin-bottom: 12px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: flex-start !important;
-    gap: 16px !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: hidden;
-    transition: border-color 0.25s var(--jp-ease), box-shadow 0.25s var(--jp-ease), transform 0.25s var(--jp-ease) !important;
-    position: relative;
-}
-
-.job-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3.5px;
-    background: var(--jp-primary);
-    border-radius: var(--jp-radius-xs) 0 0 var(--jp-radius-xs);
-    transform: scaleY(0);
-    transform-origin: top;
-    transition: transform 0.25s var(--jp-ease);
+    gap: 1.5rem !important;
+    transition: var(--jp-transition) !important;
+    box-shadow: var(--jp-shadow-sm) !important;
 }
 
 .job-card:hover {
-    border-color: rgba(59, 102, 245, 0.30) !important;
-    box-shadow: var(--jp-shadow-md) !important;
+    border-color: var(--jp-primary) !important;
+    box-shadow: var(--jp-shadow) !important;
     transform: translateY(-2px) !important;
 }
 
-.job-card:hover::before { transform: scaleY(1); }
-
 /* Card body */
 .job-card-body {
-    flex: 1 1 0% !important;
+    flex: 1 !important;
     min-width: 0 !important;
-    overflow: hidden;
-    padding: 0 !important;
 }
 
 .job-card-body h5 {
-    font-size: 1rem !important;
+    font-size: 1.125rem !important;
     font-weight: 700 !important;
-    color: var(--jp-navy) !important;
-    margin: 0 0 4px !important;
-    line-height: 1.35 !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--jp-text-heading) !important;
+    margin-bottom: 0.5rem !important;
 }
 
 .job-card-body h5 a {
@@ -872,15 +775,12 @@ a:hover { color: var(--jp-primary-dark); }
 
 .company-name {
     color: var(--jp-primary) !important;
-    font-size: 0.8125rem !important;
+    font-size: 0.875rem !important;
     font-weight: 600 !important;
-    margin: 0 0 10px !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    margin-bottom: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
 }
 
 /* Meta info row */
@@ -888,57 +788,36 @@ a:hover { color: var(--jp-primary-dark); }
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
-    gap: 4px 12px !important;
-    font-size: 0.8rem !important;
+    gap: 1rem !important;
+    font-size: 0.875rem !important;
     color: var(--jp-text-muted) !important;
-    margin: 0 !important;
 }
 
 .job-meta-info span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-    background: var(--jp-bg-subtle);
-    border-radius: var(--jp-radius-pill);
-    padding: 3px 10px;
-    border: 1px solid var(--jp-border);
-    font-weight: 500;
-    color: var(--jp-text-body);
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
 }
-
-.job-meta-info i { font-size: 0.7rem; opacity: 0.75; }
 
 .salary-badge {
     color: var(--jp-success) !important;
-    background: var(--jp-success-light) !important;
-    border-color: rgba(11, 162, 93, 0.25) !important;
     font-weight: 700 !important;
 }
 
 /* Card right action column */
 .job-card-action {
-    flex: 0 0 auto !important;
-    width: 115px !important;
+    flex-shrink: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-end !important;
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    padding-top: 2px !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
 }
 
 .job-posted-date {
     font-size: 0.75rem !important;
     color: var(--jp-text-muted) !important;
-    white-space: nowrap !important;
-    text-align: right !important;
-    line-height: 1.4 !important;
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }
-
 
 /* -----------------------------------------------------------------------
  * 14. PAGINATION
@@ -946,18 +825,17 @@ a:hover { color: var(--jp-primary-dark); }
 .pagination {
     display: flex !important;
     justify-content: center !important;
-    gap: 6px !important;
-    margin-top: 28px !important;
-    margin-bottom: 48px !important;
-    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    margin-top: 3rem !important;
+    margin-bottom: 4rem !important;
 }
 
 .page-link {
-    padding: 8px 16px !important;
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--jp-border) !important;
-    border-radius: var(--jp-radius-sm) !important;
-    color: var(--jp-navy) !important;
+    padding: 0.625rem 1.125rem !important;
+    background: var(--jp-bg-card) !important;
+    border: 1px solid var(--jp-border) !important;
+    border-radius: var(--jp-radius-md) !important;
+    color: var(--jp-text-body) !important;
     text-decoration: none !important;
     transition: var(--jp-transition) !important;
     font-weight: 600 !important;
@@ -974,8 +852,8 @@ a:hover { color: var(--jp-primary-dark); }
     background: var(--jp-primary) !important;
     border-color: var(--jp-primary) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(59, 102, 245, 0.30);
 }
+
 
 .page-ellipsis {
     padding: 8px 13px;
@@ -1032,55 +910,42 @@ a:hover { color: var(--jp-primary-dark); }
  * 16. CTA SECTION
  * ----------------------------------------------------------------------- */
 .cta-section {
-    background: linear-gradient(135deg, #2a52d4 0%, var(--jp-primary) 100%) !important;
+    background: var(--jp-primary) !important;
     color: #FFFFFF !important;
-    padding: 72px 48px !important;
+    padding: 60px 40px !important;
     text-align: center !important;
-    border-radius: var(--jp-radius-xl) !important;
-    margin: 72px 0 !important;
+    border-radius: var(--jp-radius-md) !important;
+    margin: 60px 0 !important;
     position: relative;
-    overflow: hidden;
-}
-
-.cta-section::before {
-    content: '';
-    position: absolute;
-    width: 350px;
-    height: 350px;
-    background: rgba(255,255,255,0.07);
-    border-radius: 50%;
-    top: -120px;
-    right: -60px;
-    pointer-events: none;
+    box-shadow: var(--jp-shadow-sm);
 }
 
 .cta-title {
     font-size: clamp(1.5rem, 3vw, 2rem) !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
     color: #FFFFFF !important;
-    margin-bottom: 14px !important;
+    margin-bottom: 0.75rem !important;
 }
 
 .cta-subtitle {
-    font-size: 1.0625rem !important;
-    color: rgba(255, 255, 255, 0.88) !important;
-    opacity: 1 !important;
-    margin-bottom: 36px !important;
+    font-size: 1.125rem !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    margin-bottom: 2rem !important;
 }
 
 .cta-buttons {
     display: flex !important;
-    gap: 16px !important;
+    gap: 1rem !important;
     justify-content: center !important;
     flex-wrap: wrap !important;
 }
 
 .btn-cta {
-    padding: 14px 36px !important;
-    border-radius: var(--jp-radius-pill) !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700 !important;
-    font-size: 0.9375rem;
+    padding: 0.875rem 2.5rem !important;
+    border-radius: var(--jp-radius-sm) !important;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600 !important;
+    font-size: 1rem;
     text-decoration: none !important;
     transition: var(--jp-transition) !important;
     display: inline-flex;
@@ -1091,26 +956,21 @@ a:hover { color: var(--jp-primary-dark); }
 .btn-cta-primary {
     background: #FFFFFF !important;
     color: var(--jp-primary) !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 
 .btn-cta-primary:hover {
-    background: var(--jp-primary-light) !important;
-    color: var(--jp-primary) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+    background: #F8F9FA !important;
 }
 
 .btn-cta-secondary {
     background: transparent !important;
     color: #FFFFFF !important;
-    border: 2px solid rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
 .btn-cta-secondary:hover {
-    background: rgba(255,255,255,0.12) !important;
+    background: rgba(255,255,255,0.1) !important;
     border-color: #FFFFFF !important;
-    color: #FFFFFF !important;
 }
 
 
@@ -1482,234 +1342,65 @@ a:hover { color: var(--jp-primary-dark); }
 /* -----------------------------------------------------------------------
  * 24. UTILITIES
  * ----------------------------------------------------------------------- */
-main.container {
-    padding-top: 2.5rem;
-    padding-bottom: 3rem;
-}
+main.container { padding: 2rem 0; }
 
-footer,
-.footer {
-    background: var(--jp-navy);
-    color: rgba(255, 255, 255, 0.78);
-    padding: 2rem 0;
+/* -----------------------------------------------------------------------
+ * 7. FOOTER
+ * ----------------------------------------------------------------------- */
+footer, .footer {
+    background: var(--jp-bg-card);
+    border-top: 1px solid var(--jp-border);
+    padding: 4rem 0;
     margin-top: 5rem;
-    font-size: 0.9rem;
     text-align: center;
+    color: var(--jp-text-muted);
 }
 
-footer a,
-.footer a {
-    color: rgba(255, 255, 255, 0.7);
+footer a, .footer a {
+    color: var(--jp-text-body);
     transition: var(--jp-transition);
 }
 
-footer a:hover,
-.footer a:hover { color: #FFFFFF; }
-
-/* Card fade-in animation */
-@keyframes jpFadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0);    }
+footer a:hover, .footer a:hover {
+    color: var(--jp-primary);
 }
 
-.job-item-fade { animation: jpFadeUp 0.4s var(--jp-ease) both; }
-.job-item-fade:nth-child(1) { animation-delay: 0.03s; }
-.job-item-fade:nth-child(2) { animation-delay: 0.06s; }
-.job-item-fade:nth-child(3) { animation-delay: 0.09s; }
-.job-item-fade:nth-child(4) { animation-delay: 0.12s; }
-.job-item-fade:nth-child(5) { animation-delay: 0.15s; }
-.job-item-fade:nth-child(6) { animation-delay: 0.18s; }
-
-
 /* -----------------------------------------------------------------------
- * 25. RESPONSIVE — TABLET ≤ 991 px
+ * 8. RESPONSIVE
  * ----------------------------------------------------------------------- */
 @media (max-width: 991px) {
-
-    /* Navbar */
-    .navbar {
-        padding: 0.625rem 0;
-    }
-
     .navbar-collapse {
-        background: #FFFFFF;
-        border-top: 1px solid var(--jp-border);
-        padding: 1rem 0;
-        margin-top: 0.5rem;
-        border-radius: 0 0 var(--jp-radius-md) var(--jp-radius-md);
+        background: var(--jp-bg-card);
+        border: 1px solid var(--jp-border);
+        border-radius: var(--jp-radius-lg);
+        padding: 1.5rem;
+        margin-top: 1rem;
         box-shadow: var(--jp-shadow-md);
     }
-
-    .navbar-nav .btn-primary {
-        display: block;
-        margin: 0.5rem 1rem;
-        width: calc(100% - 2rem);
-        text-align: center;
-    }
-
-    /* Hero */
-    .hero-banner { padding: 60px 0 50px !important; }
-
-    /* Stats */
-    .stats-bar .row > [class*="col-"] {
-        margin-bottom: 1rem;
-    }
-
-    /* Sidebar */
-    .filter-sidebar {
-        position: static !important;
-        margin-bottom: 24px;
-    }
-
-    /* Category grid */
-    .category-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-    }
-
-    /* Results header */
-    .results-header {
-        flex-direction: column;
-        gap: 0.875rem;
-        align-items: stretch;
-    }
-
-    .sort-dropdown { width: 100%; justify-content: space-between; }
-
-    /* CTA */
-    .cta-section { padding: 52px 24px !important; }
+    
+    .hero-banner { padding: 60px 0; }
+    .stat-number { font-size: 2.5rem; }
 }
 
-
-/* -----------------------------------------------------------------------
- * 26. RESPONSIVE — MOBILE ≤ 767 px
- * ----------------------------------------------------------------------- */
-@media (max-width: 767px) {
-
-    body { font-size: 15px; }
-
-    /* Hero */
-    .hero-banner {
-        padding: 56px 0 44px !important;
-        text-align: center;
-    }
-
-    .hero-banner .hero-subtitle { max-width: 100%; }
-
-    /* Capsule search */
-    .search-box-hero {
-        flex-direction: column !important;
-        border-radius: var(--jp-radius-md) !important;
-        padding: 12px !important;
-        gap: 8px;
-    }
-
-    .search-box-hero form { flex-direction: column; }
-
-    .search-box-hero input {
-        padding: 12px !important;
-        border-radius: var(--jp-radius-sm) !important;
-    }
-
-    .search-box-hero button {
-        width: 100% !important;
-        border-radius: var(--jp-radius-sm) !important;
-        justify-content: center;
-    }
-
-    /* Stats */
-    .stats-bar { padding: 28px 0 !important; }
-
-    /* Sections */
-    .section { padding: 52px 0 !important; }
-
-    /* Category */
-    .category-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-
-    /* Row job card → stacked */
-    .job-card {
-        flex-direction: column !important;
-    }
-
-    .job-card-action {
-        flex-direction: row !important;
-        align-items: center !important;
-        width: 100% !important;
-        justify-content: space-between !important;
-    }
-
-    .job-card-body h5,
-    .company-name {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: unset !important;
-    }
-
-    /* Browse header */
-    .browse-header { padding: 36px 0 !important; margin-bottom: 20px !important; }
-
-    /* CTA */
-    .cta-section { padding: 48px 20px !important; margin: 48px 0 !important; }
-
-    .cta-buttons { flex-direction: column !important; }
-
-    .btn-cta { justify-content: center; width: 100%; }
-
-    /* Load more */
-    #loadMoreBtn { padding: 0.75rem 2rem; width: 100%; justify-content: center; }
-
-    /* Main */
-    main.container { padding-top: 1.5rem; }
+@media (max-width: 768px) {
+    .hero-title { font-size: 2.5rem; }
+    .cta-section { padding: 3rem 1.5rem; }
+    .cta-buttons { flex-direction: column; }
+    .btn-cta { width: 100%; justify-content: center; }
 }
 
-
-/* -----------------------------------------------------------------------
- * 27. RESPONSIVE — SMALL MOBILE ≤ 575 px
- * ----------------------------------------------------------------------- */
-@media (max-width: 575px) {
-
-    .hero-banner { padding: 44px 0 36px !important; }
-
-    .category-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+/* Custom Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .category-card { padding: 20px 12px !important; }
-
-    .stat-number { font-size: 2rem !important; }
-
-    .section-title { font-size: 1.5rem !important; }
-
-    .company-list { gap: 10px !important; }
-
-    .company-item { padding: 10px 16px !important; font-size: 0.85rem; }
-
-    .cta-section { border-radius: var(--jp-radius-md) !important; }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-
-/* -----------------------------------------------------------------------
- * 28. PRINT
- * ----------------------------------------------------------------------- */
-@media print {
-
-    .navbar,
-    .hero-banner,
-    .stats-bar,
-    .search-section,
-    .search-box-hero,
-    .browse-header,
-    .filter-sidebar,
-    .loading-overlay,
-    footer { display: none !important; }
-
-    .job-card,
-    .job-card-compact {
-        break-inside: avoid;
-        page-break-inside: avoid;
-        box-shadow: none !important;
-        border: 1px solid #ccc !important;
-    }
+.animate-up {
+    animation: fadeInUp 0.6s var(--jp-ease) both;
 }

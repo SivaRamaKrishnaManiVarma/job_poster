@@ -88,158 +88,10 @@ $pageTitle = 'Job Portal - Find Your Dream Job';
 include 'includes/header.php';
 ?>
 
-<style>
-    :root {
-        --dark-blue: #1e40af;
-        --light-blue: #3b82f6;
-        --very-light-blue: #dbeafe;
-        --text-dark: #1f2937;
-        --text-gray: #6b7280;
-        --border-gray: #e5e7eb;
-        --white: #ffffff;
-    }
-
-    .hero-banner {
-        background: var(--dark-blue);
-        color: white;
-        padding: 80px 0 60px;
-        position: relative;
-        overflow: hidden;
-    }
-    .hero-banner::before {
-        content: '';
-        position: absolute;
-        top: 0; right: 0; bottom: 0; left: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".15" fill="%23ffffff"/></svg>') no-repeat bottom;
-        background-size: cover;
-        opacity: 0.1;
-    }
-    .hero-content { position: relative; z-index: 1; }
-    .hero-title { font-size: 3rem; font-weight: 800; margin-bottom: 16px; }
-    .hero-subtitle { font-size: 1.25rem; opacity: 0.95; margin-bottom: 32px; }
-    .search-box-hero {
-        background: white;
-        border-radius: 50px;
-        padding: 8px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        max-width: 700px;
-        margin: 0 auto;
-    }
-    .search-box-hero form { display: flex; gap: 8px; }
-    .search-box-hero input {
-        flex: 1; border: none;
-        padding: 12px 24px; font-size: 16px; outline: none;
-        border-radius: 50px;
-    }
-    .search-box-hero button {
-        background: var(--light-blue); color: white;
-        border: none; padding: 12px 32px;
-        border-radius: 50px; font-weight: 600;
-        cursor: pointer; transition: all 0.2s;
-        white-space: nowrap;
-    }
-    .search-box-hero button:hover { background: var(--dark-blue); }
-
-    .stats-bar { background: white; padding: 32px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .stat-item { text-align: center; }
-    .stat-number { font-size: 2.5rem; font-weight: 800; color: var(--light-blue); margin-bottom: 8px; }
-    .stat-label { color: var(--text-gray); font-size: 14px; }
-
-    .section { padding: 60px 0; }
-    .section-header { text-align: center; margin-bottom: 48px; }
-    .section-title { font-size: 2rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; }
-    .section-subtitle { color: var(--text-gray); font-size: 1.1rem; }
-
-    .category-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 20px;
-    }
-    .category-card {
-        background: white; border: 2px solid var(--border-gray);
-        border-radius: 12px; padding: 24px 16px;
-        text-align: center; text-decoration: none;
-        transition: all 0.3s; display: block;
-    }
-    .category-card:hover {
-        border-color: var(--light-blue);
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
-    }
-    .category-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
-    .category-name { font-weight: 600; color: var(--text-dark); font-size: 14px; margin-bottom: 8px; }
-    .category-count { color: #9ca3af; font-size: 13px; }
-
-    /* ✅ FIXED: Job cards are now fully clickable */
-    .job-card-compact {
-        background: white; border: 1px solid var(--border-gray);
-        border-radius: 12px; padding: 20px;
-        transition: all 0.3s; height: 100%;
-        display: block; text-decoration: none;
-        color: inherit;
-    }
-    .job-card-compact:hover {
-        border-color: var(--light-blue);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        transform: translateY(-2px);
-        color: inherit;
-        text-decoration: none;
-    }
-    .job-company { color: var(--light-blue); font-weight: 600; font-size: 14px; margin-bottom: 8px; }
-    .job-title { font-weight: 700; color: var(--text-dark); font-size: 16px; margin-bottom: 12px; line-height: 1.4; }
-    .job-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--text-gray); margin-bottom: 16px; }
-    .job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .job-tag { background: var(--very-light-blue); padding: 4px 10px; border-radius: 12px; font-size: 12px; color: var(--dark-blue); }
-
-    .match-badge-small {
-        display: inline-block;
-        background: #10b981; color: white;
-        padding: 4px 10px; border-radius: 12px;
-        font-size: 12px; font-weight: 600;
-        margin-bottom: 10px;
-    }
-
-    .cta-section {
-        background: var(--dark-blue); color: white;
-        padding: 60px 0; text-align: center;
-        border-radius: 16px; margin: 60px 0;
-    }
-    .cta-title { font-size: 2rem; font-weight: 700; margin-bottom: 16px; }
-    .cta-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 32px; }
-    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .btn-cta { padding: 14px 32px; border-radius: 50px; font-weight: 600; text-decoration: none; transition: all 0.3s; }
-    .btn-cta-primary { background: white; color: var(--dark-blue); }
-    .btn-cta-primary:hover { background: var(--very-light-blue); color: var(--dark-blue); transform: scale(1.05); }
-    .btn-cta-secondary { background: transparent; color: white; border: 2px solid white; }
-    .btn-cta-secondary:hover { background: white; color: var(--dark-blue); }
-
-    .company-list { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
-    .company-item {
-        background: #f9fafb; padding: 12px 24px;
-        border-radius: 8px; font-weight: 500;
-        color: var(--text-dark); display: flex;
-        align-items: center; gap: 8px;
-        text-decoration: none; transition: all 0.2s;
-        border: 1px solid var(--border-gray);
-    }
-    .company-item:hover {
-        border-color: var(--light-blue);
-        background: var(--very-light-blue);
-        color: var(--dark-blue);
-    }
-    .company-badge { background: var(--light-blue); color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-
-    @media (max-width: 768px) {
-        .hero-title { font-size: 2rem; }
-        .hero-subtitle { font-size: 1rem; }
-        .cta-buttons { flex-direction: column; }
-    }
-</style>
-
 <!-- Hero Section -->
 <div class="hero-banner">
     <div class="container">
-        <div class="hero-content text-center">
+        <div class="hero-content">
             <?php if ($isLoggedIn): ?>
                 <h1 class="hero-title">Welcome Back! 👋</h1>
                 <p class="hero-subtitle">We found <?= number_format($totalJobs) ?>+ jobs matching your profile</p>
@@ -250,16 +102,16 @@ include 'includes/header.php';
 
             <div class="search-box-hero">
                 <form action="<?= url('browse-jobs.php') ?>" method="GET">
-                    <input type="text" name="search" placeholder="🔍 Search by job title, skills, or company..." required>
+                    <input type="text" name="search" placeholder="Search by job title, skills, or company..." required>
                     <button type="submit">Search Jobs</button>
                 </form>
             </div>
 
             <?php if (!$isLoggedIn): ?>
                 <div class="mt-4">
-                    <p class="mb-0" style="opacity: 0.9;">
+                    <p class="mb-0 text-muted">
                         New here?
-                        <a href="<?= url('auth/register.php') ?>" style="color: white; font-weight: 600; text-decoration: underline;">
+                        <a href="<?= url('auth/register.php') ?>" class="fw-bold text-primary">
                             Create account
                         </a>
                         to get personalized job recommendations
@@ -269,6 +121,7 @@ include 'includes/header.php';
         </div>
     </div>
 </div>
+
 
 <!-- Stats Bar -->
 <div class="stats-bar">
@@ -376,7 +229,7 @@ include 'includes/header.php';
     </div>
 
     <!-- Latest Jobs -->
-    <div class="section" style="background: #f9fafb; margin: 0 -15px; padding: 60px 15px;">
+    <div class="section">
         <div class="section-header">
             <h2 class="section-title">Latest Job Openings</h2>
             <p class="section-subtitle">Fresh opportunities posted recently</p>

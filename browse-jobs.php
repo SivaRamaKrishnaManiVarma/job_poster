@@ -142,230 +142,25 @@ $pageTitle = $categoryInfo ? $categoryInfo['category_name'] . ' Jobs' : 'Browse 
 include 'includes/header.php';
 ?>
 
-<style>
-:root {
-    --dark-blue:       #1e40af;
-    --light-blue:      #3b82f6;
-    --very-light-blue: #eff6ff;
-    --text-dark:       #1f2937;
-    --text-gray:       #6b7280;
-    --border-gray:     #e5e7eb;
-}
-
-/* ── Page Header ── */
-.browse-header {
-    background: var(--dark-blue);
-    color: white;
-    padding: 40px 0;
-    margin-bottom: 24px;
-    border-bottom: 3px solid var(--light-blue);
-}
-.browse-header h1 { font-weight: 700; font-size: 1.75rem; margin-bottom: 6px; }
-.browse-header p  { font-size: 0.95rem; opacity: 0.9; }
-
-/* ── Sidebar ── */
-.filter-sidebar {
-    background: #fff;
-    border: 1px solid var(--border-gray);
-    border-radius: 8px;
-    padding: 20px;
-    position: sticky;
-    top: 80px;
-}
-.filter-section {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-gray);
-}
-.filter-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.filter-title {
-    font-size: 13px; font-weight: 700; color: var(--text-dark);
-    margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-}
-
-/* Category items */
-.category-item {
-    padding: 8px 10px; margin-bottom: 4px; border-radius: 6px;
-    display: flex; justify-content: space-between; align-items: center;
-    text-decoration: none; color: #374151;
-    transition: all 0.2s; border: 1px solid transparent; font-size: 14px;
-}
-.category-item:hover         { background: var(--very-light-blue); color: var(--light-blue); border-color: #bfdbfe; }
-.category-item.active        { background: #dbeafe; color: var(--dark-blue); font-weight: 600; border-color: #93c5fd; }
-.category-item .badge        { background: #f3f4f6; color: var(--text-gray); font-size: 11px; padding: 2px 6px; border-radius: 10px; }
-.category-item.active .badge { background: #bfdbfe; color: var(--dark-blue); }
-
-/* Search box */
-.search-box       { position: relative; margin-bottom: 12px; }
-.search-box input {
-    padding: 8px 12px 8px 36px; border: 1px solid var(--border-gray);
-    border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;
-}
-.search-box input:focus { border-color: var(--light-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); outline: none; }
-.search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 14px; }
-
-/* Form controls */
-.form-select, .form-control {
-    border: 1px solid var(--border-gray); border-radius: 6px;
-    font-size: 14px; padding: 8px 12px;
-}
-.form-select:focus, .form-control:focus {
-    border-color: var(--light-blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); outline: none;
-}
-
-/* Active filter tags */
-.active-filters {
-    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
-    padding: 12px; background: #f9fafb; border-radius: 6px;
-    border: 1px solid var(--border-gray);
-}
-.filter-tag {
-    background: #dbeafe; color: var(--dark-blue); padding: 4px 10px;
-    border-radius: 16px; font-size: 12px; font-weight: 500;
-    display: flex; align-items: center; gap: 6px; border: 1px solid #93c5fd;
-}
-.filter-tag .remove { cursor: pointer; color: #dc2626; font-weight: bold; font-size: 14px; line-height: 1; text-decoration: none; }
-.filter-tag .remove:hover { color: #991b1b; }
-
-/* Results info */
-.results-info {
-    background: #f9fafb; padding: 12px 16px; border-radius: 6px;
-    border: 1px solid var(--border-gray); margin-bottom: 16px; font-size: 14px;
-}
-
-/* ══════════════════════════════════════════
-   JOB CARD  — fixed compact flex layout
-══════════════════════════════════════════ */
-.job-card {
-    background: white;
-    border: 1px solid var(--border-gray);
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    /* ✅ CRITICAL: flex row, height = content only */
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-start !important;
-    gap: 12px;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.job-card:hover {
-    border-color: var(--light-blue);
-    box-shadow: 0 2px 8px rgba(37,99,235,.08);
-}
-
-/* Left: text content */
-.job-card-body {
-    flex: 1 1 0%;
-    min-width: 0;       /* ✅ prevents flex overflow */
-    overflow: hidden;
-}
-.job-card-body h5 {
-    font-size: 0.95rem; font-weight: 600; color: var(--text-dark);
-    margin: 0 0 3px 0; line-height: 1.35;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.job-card-body h5 a { color: inherit; text-decoration: none; }
-.job-card-body h5 a:hover { color: var(--light-blue); }
-
-.company-name {
-    color: var(--text-gray); font-size: 13px; font-weight: 500;
-    margin: 0 0 6px 0;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* Meta chips */
-.job-meta-info {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 3px 10px; font-size: 12px; color: var(--text-gray); margin: 0;
-}
-.job-meta-info span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
-.job-meta-info i    { font-size: 10px; opacity: .7; flex-shrink: 0; }
-.salary-badge       { color: #059669 !important; font-weight: 600; }
-
-/* Right: date + button */
-.job-card-action {
-    flex: 0 0 auto;         /* ✅ fixed width, never grows */
-    width: 105px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-start;   /* ✅ button stays at TOP */
-    gap: 6px;
-    padding-top: 1px;
-}
-.job-posted-date {
-    font-size: 11px; color: #9ca3af;
-    white-space: nowrap; text-align: right; line-height: 1.3;
-}
-
-/* Buttons */
-.btn-primary {
-    background: var(--light-blue); border-color: var(--light-blue);
-    font-weight: 600; font-size: 12px; padding: 5px 10px;
-    white-space: nowrap; border-radius: 4px;
-}
-.btn-primary:hover    { background: var(--dark-blue); border-color: var(--dark-blue); }
-.btn-outline-danger   { border-color: #dc2626; color: #dc2626; font-weight: 600; font-size: 13px; }
-.btn-outline-danger:hover { background: #dc2626; border-color: #dc2626; color: white; }
-.btn-outline-secondary { font-size: 13px; }
-
-/* Empty state */
-.empty-state {
-    text-align: center; padding: 60px 20px; color: var(--text-gray);
-    background: #f9fafb; border-radius: 8px;
-    border: 2px dashed #d1d5db; margin-bottom: 40px;
-}
-.empty-state i  { color: #9ca3af; margin-bottom: 16px; display: block; }
-.empty-state h5 { color: #374151; font-weight: 700; margin-bottom: 10px; }
-
-/* Pagination */
-.pagination {
-    display: flex; justify-content: center; gap: 6px;
-    margin-top: 20px; margin-bottom: 40px; flex-wrap: wrap;
-}
-.page-link {
-    padding: 7px 13px; background: white; border: 1px solid var(--border-gray);
-    border-radius: 6px; color: #374151; text-decoration: none;
-    transition: all 0.2s; font-weight: 500; font-size: 14px;
-}
-.page-link:hover  { border-color: var(--light-blue); background: var(--very-light-blue); color: var(--light-blue); }
-.page-link.active { background: var(--light-blue); border-color: var(--light-blue); color: white; }
-.page-ellipsis    { padding: 7px 13px; border: none; cursor: default; color: #9ca3af; }
-
-/* Responsive */
-@media (max-width: 991px) {
-    .filter-sidebar { position: static; margin-bottom: 20px; }
-}
-@media (max-width: 576px) {
-    .job-card { flex-direction: column !important; }
-    .job-card-action {
-        flex-direction: row; align-items: center;
-        width: 100%; justify-content: space-between;
-    }
-    .job-card-body h5,
-    .company-name { white-space: normal; overflow: visible; text-overflow: unset; }
-}
-</style>
-
 <!-- Page Header -->
 <div class="browse-header">
     <div class="container">
-        <?php if ($categoryInfo): ?>
-            <div class="d-flex align-items-center">
-                <i class="fas fa-briefcase fs-2 me-3"></i>
-                <div>
-                    <h1><?= htmlspecialchars($categoryInfo['category_name']) ?> Jobs</h1>
-                    <p class="mb-0"><?= number_format($totalCount) ?> opportunities available</p>
+        <div class="animate-up">
+            <?php if ($categoryInfo): ?>
+                <div class="d-flex align-items-center">
+                    <div class="category-icon-wrapper me-4">
+                         <i class="<?= htmlspecialchars($categoryInfo['icon'] ?: 'fas fa-briefcase') ?> fa-2x"></i>
+                    </div>
+                    <div>
+                        <h1 class="mb-1"><?= htmlspecialchars($categoryInfo['category_name']) ?> Jobs</h1>
+                        <p class="mb-0"><?= number_format($totalCount) ?> opportunities available</p>
+                    </div>
                 </div>
-            </div>
-        <?php else: ?>
-            <h1>Browse All Jobs</h1>
-            <p class="mb-0"><?= number_format($totalCount) ?> opportunities available</p>
-        <?php endif; ?>
+            <?php else: ?>
+                <h1>Browse All Jobs</h1>
+                <p class="mb-0">Discover <?= number_format($totalCount) ?>+ opportunities available today</p>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 
