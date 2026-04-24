@@ -290,11 +290,11 @@ a:hover { color: var(--jp-primary-dark); }
 
 /* ── Homepage hero ── */
 .hero-banner {
-    background: #FFFFFF !important;
+    background: #f4f8fb !important;
     color: var(--jp-text-heading) !important;
-    padding: 80px 0 60px !important;
+    padding: 100px 0 90px !important;
     position: relative;
-    border-bottom: 1px solid var(--jp-border);
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .hero-content { position: relative; z-index: 2; text-align: center; }
@@ -320,12 +320,12 @@ a:hover { color: var(--jp-primary-dark); }
 /* ── Capsule search inside hero ── */
 .search-box-hero {
     background: #FFFFFF !important;
-    border: 1px solid var(--jp-border) !important;
-    border-radius: var(--jp-radius-sm) !important;
-    padding: 4px 4px 4px 1rem !important;
-    box-shadow: var(--jp-shadow-sm) !important;
-    max-width: 700px !important;
-    margin: 0 auto 1.5rem !important;
+    border: 1px solid rgba(0,139,220,0.2) !important;
+    border-radius: 50px !important;
+    padding: 8px 8px 8px 1.5rem !important;
+    box-shadow: 0 10px 30px rgba(0, 139, 220, 0.08) !important;
+    max-width: 750px !important;
+    margin: 0 auto 2.5rem !important;
     display: flex !important;
     align-items: center;
     transition: var(--jp-transition);
@@ -363,14 +363,15 @@ a:hover { color: var(--jp-primary-dark); }
     background: var(--jp-primary) !important;
     color: #FFFFFF !important;
     border: none !important;
-    padding: 0.875rem 2.5rem !important;
-    border-radius: var(--jp-radius-sm) !important;
+    padding: 1rem 3rem !important;
+    border-radius: 50px !important;
     font-family: 'Inter', sans-serif;
     font-size: 1rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     cursor: pointer;
     transition: var(--jp-transition);
     white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 139, 220, 0.2) !important;
 }
 
 .search-box-hero button:hover {
@@ -409,10 +410,14 @@ a:hover { color: var(--jp-primary-dark); }
  * ----------------------------------------------------------------------- */
 .stats-bar {
     background: #FFFFFF !important;
-    padding: 40px 0 !important;
-    box-shadow: var(--jp-shadow-sm) !important;
-    border-top: 1px solid var(--jp-border);
-    border-bottom: 1px solid var(--jp-border);
+    padding: 30px 0 !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid var(--jp-border) !important;
+    border-radius: 12px !important;
+    position: relative;
+    z-index: 10;
+    max-width: 1000px;
+    margin: -45px auto 60px auto !important;
 }
 
 .stat-item { text-align: center; }
